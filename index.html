@@ -173,7 +173,7 @@
                     </div>
                 </div>
                 <!-- Projects -->
-                <div id="projects" class="tab-content">
+                <div id="projects" class="tab-content space-y-10">
                     <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl max-w-3xl mx-auto shadow-lg">
                         <h2 class="text-2xl font-bold mb-6 text-white">Adicionar Novo Projeto</h2>
                         <form id="add-project-form">
@@ -212,6 +212,30 @@
                             </div>
                             <button type="submit" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Adicionar Projeto</button>
                         </form>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 text-white">Meus Projetos</h2>
+                        <div class="flex flex-col md:flex-row gap-4 mb-6">
+                            <input type="search" id="search-projects-input" placeholder="Buscar por nome ou cliente..." class="w-full md:w-1/2 p-3 bg-[#161b22] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div id="project-filters" class="flex items-center gap-2 bg-[#161b22] border border-[#30363d] p-1 rounded-lg">
+                                <button data-filter="all" class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white">Todos</button>
+                                <button data-filter="pending" class="px-4 py-2 text-sm rounded-md hover:bg-[#30363d] transition-colors">Pendentes</button>
+                                <button data-filter="overdue" class="px-4 py-2 text-sm rounded-md hover:bg-[#30363d] transition-colors">Atrasados</button>
+                                <button data-filter="completed" class="px-4 py-2 text-sm rounded-md hover:bg-[#30363d] transition-colors">Concluídos</button>
+                            </div>
+                        </div>
+
+                        <div id="inprogress-projects-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                            <!-- In-progress projects will be rendered here -->
+                        </div>
+
+                        <div id="completed-projects-section" class="mt-12" style="display: none;">
+                            <h2 class="text-2xl font-bold mb-4 text-white">Projetos Concluídos</h2>
+                            <div id="completed-projects-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                                <!-- Completed projects will be rendered here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Portfolios -->
@@ -414,6 +438,10 @@
         let unsubscribeFromPortfolios = null;
         let noteUpdateTimeout = null;
         let monthlyIncomeChart = null;
+        let timeUpdateInterval = null; // <-- For auto-updating time-based UI
+        let activeProjectFilter = 'all';
+        let projectSearchTerm = '';
+
 
         // --- DOM ELEMENTS ---
         const notification = document.getElementById('notification');
@@ -458,6 +486,11 @@
         const preLoginYesBtn = document.getElementById('pre-login-yes');
         const preLoginSwitchBtn = document.getElementById('pre-login-switch');
         const homeBtn = document.getElementById('home-btn');
+        const searchProjectsInput = document.getElementById('search-projects-input');
+        const projectFilters = document.getElementById('project-filters');
+        const inprogressProjectsContainer = document.getElementById('inprogress-projects-container');
+        const completedProjectsContainer = document.getElementById('completed-projects-container');
+        const completedProjectsSection = document.getElementById('completed-projects-section');
         
         // --- PAGE LOAD ROUTING ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -556,16 +589,30 @@
                 listenToTemplates();
                 listenToPortfolios();
                 loadMyPortfolio();
+                
+                // Start interval to update time-based UI elements
+                if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+                timeUpdateInterval = setInterval(() => {
+                    renderDashboardCards();
+                    renderProjectLists();
+                    generateAndRenderNotifications();
+                }, 60000); // Update every 60 seconds
+
             } else {
                 currentUserId = null;
                 authContainer.style.display = 'flex';
                 appContainer.style.display = 'none';
+
+                // Clear interval on logout
+                if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+
                 if (unsubscribeFromProjects) unsubscribeFromProjects();
                 if (unsubscribeFromTemplates) unsubscribeFromTemplates();
                 if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
                 projects = [];
                 projectTemplates = [];
-                renderProjectCards();
+                renderDashboardCards();
+                renderProjectLists();
                 portfoliosContainer.innerHTML = '';
             }
         });
@@ -619,7 +666,8 @@
             if (!path) return;
             unsubscribeFromProjects = onSnapshot(collection(db, path), (snapshot) => {
                 projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderProjectCards();
+                renderDashboardCards();
+                renderProjectLists();
                 renderFinancialDashboard();
                 generateAndRenderNotifications();
             }, (error) => {
@@ -674,22 +722,33 @@
             });
             document.getElementById(tabId).classList.add('active');
         };
-
+        
         const calculateDaysLeft = (deadline) => {
             if (!deadline) return { days: Infinity, text: 'Sem prazo', colorClass: 'border-gray-700' };
+
             const today = new Date();
-            const deadlineDate = new Date(deadline + 'T23:59:59');
-            today.setHours(0, 0, 0, 0);
-            if (isNaN(deadlineDate.getTime())) return { days: Infinity, text: 'Data inválida', colorClass: 'border-yellow-700' };
+            today.setHours(0, 0, 0, 0); 
+
+            const parts = deadline.split('-');
+            if (parts.length !== 3) return { days: Infinity, text: 'Data inválida', colorClass: 'border-yellow-700' };
+            const deadlineDate = new Date(parts[0], parseInt(parts[1]) - 1, parts[2]);
             
-            const diffTime = deadlineDate - today;
+            if (isNaN(deadlineDate.getTime())) return { days: Infinity, text: 'Data inválida', colorClass: 'border-yellow-700' };
+
+            const diffTime = deadlineDate.getTime() - today.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
-            if (diffDays < 0) return { days: diffDays, text: `Atrasado ${Math.abs(diffDays)} dia(s)`, colorClass: 'border-red-500' };
+            if (diffDays < 0) {
+                const daysAgo = Math.abs(diffDays);
+                const dayText = daysAgo === 1 ? 'dia' : 'dias';
+                return { days: diffDays, text: `Atrasado ${daysAgo} ${dayText}`, colorClass: 'border-red-500' };
+            }
             if (diffDays === 0) return { days: diffDays, text: 'Entrega hoje!', colorClass: 'border-yellow-400' };
-            if (diffDays <= 3) return { days: diffDays, text: `Falta ${diffDays} dia(s)`, colorClass: 'border-yellow-500' };
+            if (diffDays === 1) return { days: diffDays, text: `Falta 1 dia`, colorClass: 'border-yellow-500' };
+            
             return { days: diffDays, text: `Faltam ${diffDays} dias`, colorClass: 'border-green-500' };
         };
+
 
         const getStatusIcon = (status) => {
             switch(status) {
@@ -715,18 +774,27 @@
                 </div>
             `;
         };
-
-        const renderProjectCards = () => {
-            projectCardsContainer.innerHTML = '';
-            if (projects.length === 0) {
-                projectCardsContainer.innerHTML = `<p class="text-center md:col-span-2 xl:col-span-3 2xl:col-span-4">Nenhum projeto adicionado. Vá para "Projetos" para começar.</p>`;
+        
+        const renderCards = (container, projectList) => {
+            container.innerHTML = '';
+            if (projectList.length === 0) {
+                container.innerHTML = `<p class="text-center md:col-span-2 xl:col-span-3 2xl:col-span-4 text-gray-500">Nenhum projeto encontrado.</p>`;
                 return;
             }
-             // Sort projects by deadline
-            const sortedProjects = [...projects].sort((a, b) => calculateDaysLeft(a.deadline).days - calculateDaysLeft(b.deadline).days);
+
+            const sortedProjects = [...projectList].sort((a, b) => calculateDaysLeft(a.deadline).days - calculateDaysLeft(b.deadline).days);
 
             sortedProjects.forEach(project => {
                 const deadlineInfo = calculateDaysLeft(project.deadline);
+                const isCompleted = project.progress == 100;
+
+                let finalBorderClass = deadlineInfo.colorClass;
+                let finalText = deadlineInfo.text;
+                if (isCompleted) {
+                    finalBorderClass = 'border-blue-500';
+                    finalText = 'Concluído';
+                }
+
                 const filesHTML = (project.files || []).map(file => `
                     <li class="text-xs truncate">
                         <a href="${file.url}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1.5">
@@ -734,8 +802,7 @@
                             ${file.name}
                         </a>
                     </li>`).join('') || '<li class="text-xs text-gray-500">Nenhum ficheiro.</li>';
-
-                const isCompleted = project.progress == 100;
+                
                 const commentsHTML = (project.comments || []).map(comment => `
                     <div class="text-xs p-2 rounded-md ${comment.author === 'Editor' ? 'bg-blue-900/40 text-right' : 'bg-gray-700/40'}">
                         <p>${comment.text}</p>
@@ -745,7 +812,7 @@
 
 
                 const card = document.createElement('div');
-                card.className = `bg-[#161b22] border border-[#30363d] p-5 rounded-xl shadow-lg flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1 border-l-4 ${deadlineInfo.colorClass}`;
+                card.className = `bg-[#161b22] border border-[#30363d] p-5 rounded-xl shadow-lg flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1 border-l-4 ${finalBorderClass}`;
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start mb-2">
@@ -759,7 +826,7 @@
                         </div>
                         <p class="text-sm text-gray-400 mb-1">Cliente: ${project.client || 'N/A'}</p>
                         <p class="text-sm text-gray-400 mb-2">Valor: <span class="font-semibold text-green-400">R$ ${parseFloat(project.value || 0).toFixed(2)}</span></p>
-                        <p class="text-sm font-semibold mb-4 px-2 py-1 inline-block rounded-md bg-opacity-20">${deadlineInfo.text}</p>
+                        <p class="text-sm font-semibold mb-4 px-2 py-1 inline-block rounded-md bg-opacity-20">${finalText}</p>
                         
                         <div class="border-t border-[#30363d] pt-3 mt-3 space-y-2.5">
                             ${renderStatusSelect(project.id, 'storyboardStatus', 'Storyboard', project.storyboardStatus || 'Pendente')}
@@ -791,9 +858,48 @@
                         </div>
                     </div>
                 `;
-                projectCardsContainer.appendChild(card);
+                container.appendChild(card);
             });
         };
+
+        const renderDashboardCards = () => {
+            const inProgressProjects = projects.filter(p => p.progress < 100);
+            renderCards(projectCardsContainer, inProgressProjects);
+        };
+
+        const renderProjectLists = () => {
+            let displayProjects = [...projects];
+
+            // 1. Filter by Search Term
+            if (projectSearchTerm) {
+                displayProjects = displayProjects.filter(p => 
+                    (p.name || '').toLowerCase().includes(projectSearchTerm) ||
+                    (p.client || '').toLowerCase().includes(projectSearchTerm)
+                );
+            }
+
+            // 2. Filter by Status
+            let filteredInProgress = displayProjects.filter(p => p.progress < 100);
+            let completed = displayProjects.filter(p => p.progress == 100);
+
+            if (activeProjectFilter === 'pending') {
+                filteredInProgress = filteredInProgress.filter(p => calculateDaysLeft(p.deadline).days >= 0);
+                completed = [];
+            } else if (activeProjectFilter === 'overdue') {
+                filteredInProgress = filteredInProgress.filter(p => calculateDaysLeft(p.deadline).days < 0);
+                completed = [];
+            } else if (activeProjectFilter === 'completed') {
+                filteredInProgress = [];
+            }
+            
+            // 3. Render cards
+            renderCards(inprogressProjectsContainer, filteredInProgress);
+            renderCards(completedProjectsContainer, completed);
+            
+            // 4. Show/hide completed section
+            completedProjectsSection.style.display = completed.length > 0 ? 'block' : 'none';
+        };
+
 
         const renderFinancialDashboard = () => {
             const completedProjects = projects.filter(p => p.progress == 100);
@@ -1014,7 +1120,6 @@
                     await updateDoc(projectDocRef, { public: true });
                     const url = `${window.location.origin}${window.location.pathname}?mode=client&userId=${currentUserId}&projectId=${projectId}`;
                     
-                    // Simple clipboard copy
                     const dummy = document.createElement('textarea');
                     document.body.appendChild(dummy);
                     dummy.value = url;
@@ -1160,9 +1265,9 @@
             const notifications = [];
             projects.forEach(p => {
                 const deadlineInfo = calculateDaysLeft(p.deadline);
-                if (deadlineInfo.days <= 3 && deadlineInfo.days >= 0) {
+                if (deadlineInfo.days <= 3 && deadlineInfo.days >= 0 && p.progress < 100) {
                     notifications.push({ message: `Prazo para "${p.name}" a terminar!` });
-                } else if (deadlineInfo.days < 0) {
+                } else if (deadlineInfo.days < 0 && p.progress < 100) {
                     notifications.push({ message: `Projeto "${p.name}" está atrasado!`, isUrgent: true });
                 }
             });
@@ -1280,13 +1385,48 @@
         addProjectForm.addEventListener('submit', handleAddProject);
         portfolioForm.addEventListener('submit', handleSavePortfolio);
         deletePortfolioBtn.addEventListener('click', handleDeletePortfolio);
-        projectCardsContainer.addEventListener('input', handleProjectInteraction);
-        projectCardsContainer.addEventListener('change', handleProjectInteraction);
-        projectCardsContainer.addEventListener('click', handleProjectInteraction);
+        
+        // Use a single listener on a parent container for dynamic project cards
+        document.body.addEventListener('input', (e) => {
+            if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
+                handleProjectInteraction(e);
+            }
+        });
+         document.body.addEventListener('change', (e) => {
+            if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
+                handleProjectInteraction(e);
+            }
+        });
+         document.body.addEventListener('click', (e) => {
+            if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
+                handleProjectInteraction(e);
+            }
+        });
+
         calculatePriceBtn.addEventListener('click', handleCalculatePrice);
         calculateDiscountBtn.addEventListener('click', handleCalculateDiscount);
         searchPortfolioInput.addEventListener('input', applyFiltersAndRenderPortfolios);
         portfolioFilters.addEventListener('click', handlePortfolioFilterClick);
+
+        searchProjectsInput.addEventListener('input', (e) => {
+            projectSearchTerm = e.target.value.toLowerCase();
+            renderProjectLists();
+        });
+
+        projectFilters.addEventListener('click', (e) => {
+            if(e.target.tagName === 'BUTTON') {
+                activeProjectFilter = e.target.dataset.filter;
+                // Style active button
+                projectFilters.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('hover:bg-[#30363d]');
+                });
+                e.target.classList.add('bg-blue-600', 'text-white');
+                e.target.classList.remove('hover:bg-[#30363d]');
+                renderProjectLists();
+            }
+        });
+
         notificationsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             notificationsPanel.style.display = notificationsPanel.style.display === 'block' ? 'none' : 'block';
