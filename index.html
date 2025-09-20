@@ -126,9 +126,6 @@
                     <form id="signup-form">
                         <h2 class="text-2xl font-semibold mb-6 text-center text-white">Criar Conta</h2>
                         <div class="mb-4">
-                            <input id="signup-username" type="text" placeholder="Nome de Usuário" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <div class="mb-4">
                             <input id="signup-email" type="email" placeholder="Email" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <div class="mb-6">
@@ -745,123 +742,109 @@
 
         modalCancelBtn.addEventListener('click', hideConfirmationModal);
 
-        // --- AUTHENTICATION ---
-        onAuthStateChanged(auth, async (user) => {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('mode') === 'client') return;
+       // --- AUTHENTICATION ---
+onAuthStateChanged(auth, async (user) => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'client') return;
 
-            if (user) {
-                localStorage.setItem('lastUserEmail', user.email);
-                currentUserId = user.uid;
-                userEmailSpan.textContent = user.email;
-                authContainer.style.display = 'none';
-                appContainer.style.display = 'flex';
+    if (user) {
+        localStorage.setItem('lastUserEmail', user.email);
+        currentUserId = user.uid;
+        userEmailSpan.textContent = user.email;
+        authContainer.style.display = 'none';
+        appContainer.style.display = 'flex';
 
-                listenToUserProfile(user);
-                listenToProjects();
-                listenToTemplates();
-                listenToPortfolios();
-                listenToResources();
-                listenToReminders();
-                listenToUsers();
-                listenToConversations();
-                loadMyPortfolio();
-                
-                if (timeUpdateInterval) clearInterval(timeUpdateInterval);
-                timeUpdateInterval = setInterval(() => {
-                    renderDashboardCards();
-                    renderProjectLists();
-                    generateAndRenderNotifications();
-                }, 60000);
+        listenToUserProfile(user);
+        listenToProjects();
+        listenToTemplates();
+        listenToPortfolios();
+        listenToResources();
+        listenToReminders();
+        listenToUsers();
+        listenToConversations();
+        loadMyPortfolio();
+        
+        if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+        timeUpdateInterval = setInterval(() => {
+            renderDashboardCards();
+            renderProjectLists();
+            generateAndRenderNotifications();
+        }, 60000);
 
-            } else {
-                currentUserId = null;
-                authContainer.style.display = 'flex';
-                appContainer.style.display = 'none';
+    } else {
+        currentUserId = null;
+        authContainer.style.display = 'flex';
+        appContainer.style.display = 'none';
 
-                if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+        if (timeUpdateInterval) clearInterval(timeUpdateInterval);
 
-                if (unsubscribeFromProjects) unsubscribeFromProjects();
-                if (unsubscribeFromTemplates) unsubscribeFromTemplates();
-                if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
-                if (unsubscribeFromResources) unsubscribeFromResources();
-                if (unsubscribeFromReminders) unsubscribeFromReminders();
-                if (unsubscribeFromUsers) unsubscribeFromUsers();
-                if (unsubscribeFromConversations) unsubscribeFromConversations();
-                if (unsubscribeFromCurrentChat) unsubscribeFromCurrentChat();
-                if (unsubscribeFromProfile) unsubscribeFromProfile();
-                projects = [];
-                projectTemplates = [];
-                allCommunityResources = [];
-                reminders = [];
-                activeConversations = [];
-                allUsers = [];
-                renderDashboardCards();
-                renderProjectLists();
-                portfoliosContainer.innerHTML = '';
-            }
+        if (unsubscribeFromProjects) unsubscribeFromProjects();
+        if (unsubscribeFromTemplates) unsubscribeFromTemplates();
+        if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
+        if (unsubscribeFromResources) unsubscribeFromResources();
+        if (unsubscribeFromReminders) unsubscribeFromReminders();
+        if (unsubscribeFromUsers) unsubscribeFromUsers();
+        if (unsubscribeFromConversations) unsubscribeFromConversations();
+        if (unsubscribeFromCurrentChat) unsubscribeFromCurrentChat();
+        if (unsubscribeFromProfile) unsubscribeFromProfile();
+        projects = [];
+        projectTemplates = [];
+        allCommunityResources = [];
+        reminders = [];
+        activeConversations = [];
+        allUsers = [];
+        renderDashboardCards();
+        renderProjectLists();
+        portfoliosContainer.innerHTML = '';
+    }
+});
+
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    signInWithEmailAndPassword(auth, email, password)
+        .catch(error => {
+            loginErrorMsg.textContent = "Email ou senha inválidos.";
         });
+});
 
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            signInWithEmailAndPassword(auth, email, password)
-                .catch(error => {
-                    loginErrorMsg.textContent = "Email ou senha inválidos.";
-                });
+signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+            email: email,
+            username: email.split('@')[0],
+            createdAt: serverTimestamp(),
+            deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
         });
+    } catch (error) {
+        switch (error.code) {
+            case 'auth/email-already-in-use': signupErrorMsg.textContent = "Este email já está em uso."; break;
+            case 'auth/invalid-email': signupErrorMsg.textContent = "O formato do email é inválido."; break;
+            case 'auth/weak-password': signupErrorMsg.textContent = "A senha é muito fraca (mínimo 6 caracteres)."; break;
+            default: signupErrorMsg.textContent = "Ocorreu um erro ao criar a conta."; break;
+        }
+    }
+});
 
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('signup-username').value.trim();
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
+logoutBtn.addEventListener('click', () => signOut(auth));
 
-            if (username.length < 3) {
-                signupErrorMsg.textContent = "O nome de usuário deve ter no mínimo 3 caracteres.";
-                return;
-            }
+showSignupBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('signup-section').style.display = 'block';
+});
 
-            try {
-                // Check if username is already taken
-                const usernameQuery = query(collection(db, 'users'), where('username', '==', username));
-                const querySnapshot = await getDocs(usernameQuery);
-                if (!querySnapshot.empty) {
-                    signupErrorMsg.textContent = "Este nome de usuário já está em uso.";
-                    return;
-                }
-
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, 'users', userCredential.user.uid), {
-                    username: username,
-                    email: email,
-                    createdAt: serverTimestamp(),
-                    deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
-                });
-            } catch (error) {
-                switch (error.code) {
-                    case 'auth/email-already-in-use': signupErrorMsg.textContent = "Este email já está em uso."; break;
-                    case 'auth/invalid-email': signupErrorMsg.textContent = "O formato do email é inválido."; break;
-                    case 'auth/weak-password': signupErrorMsg.textContent = "A senha é muito fraca (mínimo 6 caracteres)."; break;
-                    default: signupErrorMsg.textContent = "Ocorreu um erro ao criar a conta."; break;
-                }
-            }
-        });
-
-        logoutBtn.addEventListener('click', () => signOut(auth));
-
-        showSignupBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('signup-section').style.display = 'block';
-        });
-
-        showLoginBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('signup-section').style.display = 'none';
-        });
+showLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('signup-section').style.display = 'none';
+});
         
         // --- PROFILE SYSTEM ---
         const listenToUserProfile = (user) => {
