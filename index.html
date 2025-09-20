@@ -43,6 +43,24 @@
             background: #161b22;
             color: #c9d1d9;
         }
+
+        /* Animations */
+        .card-enter {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 300ms ease-out, transform 300ms ease-out;
+        }
+        .card-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .highlight {
+            animation: highlight-anim 1.5s ease-out;
+        }
+        @keyframes highlight-anim {
+            0% { background-color: rgba(47, 129, 247, 0.3); }
+            100% { background-color: transparent; }
+        }
     </style>
 </head>
 <body class="bg-[#0d1117] text-[#c9d1d9]">
@@ -238,6 +256,10 @@
                         </div>
                     </div>
                 </div>
+                <!-- Agenda -->
+                <div id="agenda" class="tab-content">
+                     <div id="calendar-container" class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl max-w-4xl mx-auto"></div>
+                </div>
                 <!-- Portfolios -->
                 <div id="portfolios" class="tab-content">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -401,6 +423,8 @@
         <!-- Client portal content will be injected here -->
     </div>
 
+    <!-- Vanilla Calendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-js-calendar@2.6.0/build/vanilla-js-calendar.min.js"></script>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -441,6 +465,7 @@
         let timeUpdateInterval = null; // <-- For auto-updating time-based UI
         let activeProjectFilter = 'all';
         let projectSearchTerm = '';
+        let calendar = null;
 
 
         // --- DOM ELEMENTS ---
@@ -491,6 +516,7 @@
         const inprogressProjectsContainer = document.getElementById('inprogress-projects-container');
         const completedProjectsContainer = document.getElementById('completed-projects-container');
         const completedProjectsSection = document.getElementById('completed-projects-section');
+        const calendarContainer = document.getElementById('calendar-container');
         
         // --- PAGE LOAD ROUTING ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -670,6 +696,7 @@
                 renderProjectLists();
                 renderFinancialDashboard();
                 generateAndRenderNotifications();
+                renderCalendar();
             }, (error) => {
                 console.error("Erro ao buscar projetos: ", error);
                 showNotification("Erro ao carregar projetos.", true);
@@ -898,6 +925,45 @@
             
             // 4. Show/hide completed section
             completedProjectsSection.style.display = completed.length > 0 ? 'block' : 'none';
+        };
+
+        const renderCalendar = () => {
+            if (!calendarContainer) return;
+            const markedDates = projects.map(p => {
+                if (p.deadline) {
+                    return {
+                        date: p.deadline,
+                        description: p.name,
+                    }
+                }
+                return null;
+            }).filter(Boolean);
+
+            const options = {
+                isDark: true,
+                markedDates,
+                 popups: projects.reduce((acc, p) => {
+                    if (p.deadline) {
+                        if (!acc[p.deadline]) {
+                            acc[p.deadline] = [];
+                        }
+                        acc[p.deadline].push({
+                            modifier: 'bg-blue-600',
+                            html: p.name,
+                        });
+                    }
+                    return acc;
+                }, {}),
+
+            };
+            if (!calendar) {
+                calendar = new VanillaCalendar(calendarContainer, options);
+                calendar.init();
+            } else {
+                calendar.options.markedDates = markedDates;
+                calendar.options.popups = options.popups;
+                calendar.update();
+            }
         };
 
 
