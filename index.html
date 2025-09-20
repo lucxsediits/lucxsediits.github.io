@@ -54,32 +54,33 @@
             0% { background-color: rgba(47, 129, 247, 0.3); }
             100% { background-color: transparent; }
         }
+        /* Chat bubble styles */
         .chat-bubble {
-            display: flex;
-            margin-bottom: 0.5rem;
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
+            padding: 8px 12px;
+            border-radius: 16px;
             max-width: 80%;
-            font-size: 0.875rem;
-            line-height: 1.25rem;
             word-wrap: break-word;
         }
         .chat-bubble.sent {
-            background-color: #2f81f7;
-            color: #fff;
+            background-color: #007bff;
+            color: white;
             margin-left: auto;
+            border-bottom-right-radius: 4px;
         }
         .chat-bubble.received {
-            background-color: #30363d;
+            background-color: #343a40;
             color: #c9d1d9;
             margin-right: auto;
+            border-bottom-left-radius: 4px;
         }
     </style>
 </head>
 <body class="bg-[#0d1117] text-[#c9d1d9]">
 
+    <!-- Global Notification -->
     <div id="notification" class="fixed top-5 right-5 bg-green-600 text-white py-2 px-5 rounded-lg shadow-2xl transform translate-x-[120%] transition-transform duration-500 ease-in-out z-50"></div>
 
+    <!-- Global Confirmation Modal -->
     <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl p-8 w-full max-w-sm text-center transform transition-all scale-95 opacity-0" id="modal-content">
             <p id="modal-message" class="text-lg mb-8"></p>
@@ -90,10 +91,12 @@
         </div>
     </div>
     
+    <!-- Auth Container -->
     <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 bg-grid-pattern">
         <div class="w-full max-w-md">
             <h1 class="text-5xl font-bold text-blue-500 text-center mb-8">Shibuya Hub</h1>
 
+            <!-- Pre-login section -->
             <div id="pre-login-section" style="display: none;" class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl shadow-2xl text-center">
                 <p class="mb-4">Continuar como:</p>
                 <p id="pre-login-email" class="font-bold text-lg text-white mb-6"></p>
@@ -101,6 +104,7 @@
                 <button id="pre-login-switch" class="w-full bg-[#30363d] hover:bg-[#484f58] font-bold py-2 px-4 rounded-lg transition-colors duration-300">Trocar de conta</button>
             </div>
             
+            <!-- Main Auth Wrapper -->
             <div id="main-auth-wrapper">
                 <div id="login-section" class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl shadow-2xl">
                     <form id="login-form">
@@ -122,6 +126,9 @@
                     <form id="signup-form">
                         <h2 class="text-2xl font-semibold mb-6 text-center text-white">Criar Conta</h2>
                         <div class="mb-4">
+                            <input id="signup-username" type="text" placeholder="Nome de Usuário" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
                             <input id="signup-email" type="email" placeholder="Email" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <div class="mb-6">
@@ -130,15 +137,17 @@
                         <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">Criar Conta</button>
                         <p id="signup-error" class="text-red-500 text-sm mt-4 text-center"></p>
                     </form>
-                     <div class="text-center mt-6">
+                    <div class="text-center mt-6">
                         <a href="#" id="show-login" class="text-blue-400 hover:underline">Já tem uma conta? Entrar</a>
-                     </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
+    <!-- App Container -->
     <div id="app-container" style="display: none;" class="flex h-screen">
+        <!-- Sidebar Navigation -->
         <nav class="w-20 bg-[#161b22] border-r border-[#30363d] flex flex-col items-center py-6 space-y-6">
             <button id="home-btn" class="text-blue-500 hover:text-blue-400 transition-colors" title="Início">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -146,51 +155,51 @@
                 </svg>
             </button>
             <div class="flex flex-col space-y-4">
-                 <button class="sidebar-link active p-3 rounded-lg text-white bg-blue-600" data-tab="dashboard" title="Visão Geral">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                 </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="projects" title="Projetos">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                 </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="portfolios" title="Portfólios">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                 </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="financial" title="Financeiro">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                 </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="calculator" title="Calculadora">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="8" y2="14"></line><line x1="16" y1="18" x2="8" y2="18"></line><line x1="10" y1="10" x2="14" y2="10"></line></svg>
-                 </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="community" title="Comunidade">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                 </button>
+                <button class="sidebar-link active p-3 rounded-lg text-white bg-blue-600" data-tab="dashboard" title="Visão Geral">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="projects" title="Projetos">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="portfolios" title="Portfólios">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="financial" title="Financeiro">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="calculator" title="Calculadora">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="8" y2="14"></line><line x1="16" y1="18" x2="8" y2="18"></line><line x1="10" y1="10" x2="14" y2="10"></line></svg>
+                </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="community" title="Comunidade">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </button>
             </div>
             <div class="mt-auto flex flex-col space-y-4">
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="messages" title="Mensagens">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                 </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="profile" title="Perfil">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                 </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="tutorial" title="Tutorial">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                 </button>
-                 <button id="logout-btn" class="p-3 rounded-lg text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Sair">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                 </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="messages" title="Mensagens">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="profile" title="Perfil">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </button>
+                <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="tutorial" title="Tutorial">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                </button>
+                <button id="logout-btn" class="p-3 rounded-lg text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Sair">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                </button>
             </div>
         </nav>
         
         <main class="flex-1 overflow-y-auto p-6 lg:p-10">
             <header class="flex justify-between items-center mb-8">
-                 <h1 id="page-title" class="text-3xl font-bold text-white">Visão Geral</h1>
-                 <div class="relative">
-                     <button id="notifications-btn" class="text-gray-400 hover:text-white transition-colors relative">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;"></span>
-                     </button>
-                     <div id="notifications-panel" class="absolute right-0 mt-2 w-80 bg-[#161b22] border border-[#30363d] rounded-lg shadow-2xl p-3 z-10" style="display: none;"></div>
-                 </div>
+                <h1 id="page-title" class="text-3xl font-bold text-white">Visão Geral</h1>
+                <div class="relative">
+                    <button id="notifications-btn" class="text-gray-400 hover:text-white transition-colors relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;"></span>
+                    </button>
+                    <div id="notifications-panel" class="absolute right-0 mt-2 w-80 bg-[#161b22] border border-[#30363d] rounded-lg shadow-2xl p-3 z-10" style="display: none;"></div>
+                </div>
             </header>
 
             <div>
@@ -238,7 +247,7 @@
                             <button type="submit" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Adicionar Projeto</button>
                         </form>
                     </div>
-                     <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl max-w-3xl mx-auto shadow-lg mt-6">
+                    <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl max-w-3xl mx-auto shadow-lg mt-6">
                         <h2 class="text-2xl font-bold mb-4 text-white">Agendar Lembrete</h2>
                         <p class="text-sm text-gray-400 mb-4">Receba uma notificação no painel em uma data e hora específicas.</p>
                         <form id="add-reminder-form">
@@ -273,23 +282,23 @@
                     </div>
                 </div>
                 <div id="agenda" class="tab-content">
-                     <div id="calendar-container" class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl max-w-4xl mx-auto"></div>
+                    <div id="calendar-container" class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl max-w-4xl mx-auto"></div>
                 </div>
                 <div id="portfolios" class="tab-content">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div class="lg:col-span-1 bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h2 class="text-2xl font-bold mb-4 text-white">Meu Portfólio</h2>
-                             <p class="text-sm mb-4">Publique seu portfólio para que outros editores e clientes possam encontrar você.</p>
-                             <form id="portfolio-form" class="space-y-4">
-                                 <input type="text" id="portfolio-name" placeholder="Seu nome de editor" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
-                                 <input type="url" id="portfolio-link" placeholder="Link do seu Portfólio" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
-                                 <input type="text" id="portfolio-specialties" placeholder="Especialidades (Ex: AMV, Edits)" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                                 <input type="text" id="portfolio-price" placeholder="Informação de Preço" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                                 <div class="flex gap-2 pt-2">
-                                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Salvar</button>
-                                     <button type="button" id="delete-portfolio-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Remover</button>
-                                 </div>
-                             </form>
+                            <h2 class="text-2xl font-bold mb-4 text-white">Meu Portfólio</h2>
+                            <p class="text-sm mb-4">Publique seu portfólio para que outros editores e clientes possam encontrar você.</p>
+                            <form id="portfolio-form" class="space-y-4">
+                                <input type="text" id="portfolio-name" placeholder="Seu nome de editor" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                                <input type="url" id="portfolio-link" placeholder="Link do seu Portfólio" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                                <input type="text" id="portfolio-specialties" placeholder="Especialidades (Ex: AMV, Edits)" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                <input type="text" id="portfolio-price" placeholder="Informação de Preço" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                <div class="flex gap-2 pt-2">
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Salvar</button>
+                                    <button type="button" id="delete-portfolio-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Remover</button>
+                                </div>
+                            </form>
                         </div>
                         <div class="lg:col-span-2">
                             <h2 class="text-2xl font-bold mb-4 text-white">Encontrar Editores</h2>
@@ -310,10 +319,10 @@
                             <h3 class="text-lg">Total Ganho (Concluídos)</h3>
                             <p id="total-earned" class="text-4xl font-bold text-green-400 mt-2">R$ 0.00</p>
                         </div>
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl text-center">
-                             <h3 class="text-lg">Potencial (Em Andamento)</h3>
-                             <p id="total-potential" class="text-4xl font-bold text-yellow-400 mt-2">R$ 0.00</p>
-                         </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl text-center">
+                            <h3 class="text-lg">Potencial (Em Andamento)</h3>
+                            <p id="total-potential" class="text-4xl font-bold text-yellow-400 mt-2">R$ 0.00</p>
+                        </div>
                     </div>
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                         <h3 class="text-xl font-bold mb-4 text-white">Ganhos Mensais</h3>
@@ -336,88 +345,81 @@
                             </div>
                         </div>
                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h2 class="text-xl font-bold mb-4 text-white">Calculadora de Desconto por Atraso</h2>
-                             <div class="space-y-3">
-                                 <input type="number" id="calc-original-value" placeholder="Valor original (R$)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                                 <input type="number" id="calc-delay" placeholder="Dias de atraso" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                                 <input type="number" id="calc-discount-percent" placeholder="Desconto por dia (%)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                                 <button id="calculate-discount-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-semibold">Calcular Desconto</button>
-                                 <div id="discount-result" class="mt-4 text-center pt-2"></div>
-                             </div>
+                            <h2 class="text-xl font-bold mb-4 text-white">Calculadora de Desconto por Atraso</h2>
+                            <div class="space-y-3">
+                                <input type="number" id="calc-original-value" placeholder="Valor original (R$)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                <input type="number" id="calc-delay" placeholder="Dias de atraso" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                <input type="number" id="calc-discount-percent" placeholder="Desconto por dia (%)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                <button id="calculate-discount-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-semibold">Calcular Desconto</button>
+                                <div id="discount-result" class="mt-4 text-center pt-2"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                 <div id="messages" class="tab-content">
-                    <div class="max-w-xl mx-auto bg-[#161b22] border border-[#30363d] p-6 rounded-xl h-[80vh] flex flex-col">
-                        <h2 class="text-2xl font-bold mb-4 text-white">Mensagens Diretas</h2>
-                        <div id="messages-container" class="flex-1 overflow-y-auto space-y-3 p-4 bg-[#0d1117] rounded-lg mb-4">
-                            <p class="text-center text-gray-500">Nenhuma conversa encontrada.</p>
-                        </div>
-                        <form id="message-form" class="flex gap-2">
-                            <input type="text" id="message-input" class="flex-1 p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" placeholder="Digite sua mensagem...">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">Enviar</button>
+                <div id="messages" class="tab-content">
+                    <div class="flex items-center justify-center h-[80vh] bg-[#161b22] border border-[#30363d] rounded-xl">
+                        <p class="text-2xl font-bold text-gray-400">EM BREVE</p>
+                    </div>
+                </div>
+                <div id="profile" class="tab-content max-w-2xl mx-auto">
+                    <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl">
+                        <h2 class="text-2xl font-bold mb-6 text-white">Meu Perfil</h2>
+                        <form id="profile-form" class="space-y-6">
+                            <div class="flex items-center gap-6">
+                                <img id="profile-pic-preview" src="https://placehold.co/100x100/161b22/c9d1d9?text=Foto" class="w-24 h-24 rounded-full object-cover bg-[#0d1117]">
+                                <div>
+                                    <label for="profile-pic-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                                        Trocar Foto
+                                    </label>
+                                    <input type="file" id="profile-pic-upload" class="hidden" accept="image/*">
+                                </div>
+                            </div>
+                            
+                            <p>Email: <span id="user-email" class="font-semibold text-white"></span></p>
+
+                            <div>
+                                <label for="profile-bio" class="block text-sm font-medium mb-2">Biografia</label>
+                                <textarea id="profile-bio" rows="4" placeholder="Fale um pouco sobre si, suas especialidades e como os clientes podem entrar em contato." class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+
+                            <div class="border-t border-[#30363d] pt-6">
+                                <h3 class="text-xl font-bold text-white mb-4">Cores de Status do Prazo</h3>
+                                <p class="text-sm text-gray-400 mb-4">Personalize as cores dos cartões de projeto para se adequar ao seu fluxo de trabalho.</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <label for="color-ok" class="block text-sm mb-1">Prazo OK</label>
+                                        <input type="color" id="color-ok" value="#22c55e" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label for="color-warning" class="block text-sm mb-1">Prazo Próximo</label>
+                                        <input type="color" id="color-warning" value="#facc15" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label for="color-danger" class="block text-sm mb-1">Prazo Atrasado</label>
+                                        <input type="color" id="color-danger" value="#ef4444" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salvar Alterações</button>
+                            </div>
                         </form>
                     </div>
                 </div>
-                 <div id="profile" class="tab-content max-w-2xl mx-auto">
-                     <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl">
-                          <h2 class="text-2xl font-bold mb-6 text-white">Meu Perfil</h2>
-                          <form id="profile-form" class="space-y-6">
-                              <div class="flex items-center gap-6">
-                                  <img id="profile-pic-preview" src="https://placehold.co/100x100/161b22/c9d1d9?text=Foto" class="w-24 h-24 rounded-full object-cover bg-[#0d1117]">
-                                  <div>
-                                      <label for="profile-pic-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                                          Trocar Foto
-                                      </label>
-                                      <input type="file" id="profile-pic-upload" class="hidden" accept="image/*">
-                                  </div>
-                              </div>
-                              
-                              <p>Email: <span id="user-email" class="font-semibold text-white"></span></p>
-
-                              <div>
-                                  <label for="profile-bio" class="block text-sm font-medium mb-2">Biografia</label>
-                                  <textarea id="profile-bio" rows="4" placeholder="Fale um pouco sobre si, suas especialidades e como os clientes podem entrar em contato." class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                              </div>
-
-                              <div class="border-t border-[#30363d] pt-6">
-                                  <h3 class="text-xl font-bold text-white mb-4">Cores de Status do Prazo</h3>
-                                  <p class="text-sm text-gray-400 mb-4">Personalize as cores dos cartões de projeto para se adequar ao seu fluxo de trabalho.</p>
-                                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                      <div>
-                                          <label for="color-ok" class="block text-sm mb-1">Prazo OK</label>
-                                          <input type="color" id="color-ok" value="#22c55e" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
-                                      </div>
-                                      <div>
-                                          <label for="color-warning" class="block text-sm mb-1">Prazo Próximo</label>
-                                          <input type="color" id="color-warning" value="#facc15" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
-                                      </div>
-                                      <div>
-                                          <label for="color-danger" class="block text-sm mb-1">Prazo Atrasado</label>
-                                          <input type="color" id="color-danger" value="#ef4444" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
-                                      </div>
-                                  </div>
-                              </div>
-
-                              <div>
-                                  <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salvar Alterações</button>
-                              </div>
-                          </form>
-                     </div>
-                 </div>
-                 <div id="community" class="tab-content max-w-4xl mx-auto space-y-6">
+                <div id="community" class="tab-content max-w-4xl mx-auto space-y-6">
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                         <h2 class="text-2xl font-bold mb-4 text-white">Comunidade</h2>
-                         <p class="text-gray-400">Encontre e compartilhe recursos valiosos para aprimorar suas habilidades de edição.</p>
-                         
-                         <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                        <h2 class="text-2xl font-bold mb-4 text-white">Comunidade</h2>
+                        <p class="text-gray-400">Encontre e compartilhe recursos valiosos para aprimorar suas habilidades de edição.</p>
+                        
+                        <div class="mt-6 flex flex-col sm:flex-row gap-4">
                             <input type="search" id="search-community-input" placeholder="Buscar por título ou tag..." class="w-full sm:w-1/2 p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <div id="community-tags-filter" class="flex flex-wrap items-center gap-2">
                                 <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="MMV">#MMV</button>
                                 <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="After Effects">#After Effects</button>
                                 <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="Edits">#Edits</button>
                             </div>
-                         </div>
+                        </div>
                     </div>
 
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
@@ -436,81 +438,82 @@
                             </div>
                     </div>
                 </div>
-                 <div id="tutorial" class="tab-content">
-                      <div class="max-w-4xl mx-auto space-y-8">
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h2 class="text-2xl font-bold text-white mb-4">Bem-vindo ao Shibuya Hub!</h2>
-                              <p>Este tutorial irá guiá-lo através de todas as funcionalidades disponíveis para que você possa gerenciar seus projetos de edição com eficiência.</p>
-                          </div>
+                <div id="tutorial" class="tab-content">
+                    <div class="max-w-4xl mx-auto space-y-8">
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h2 class="text-2xl font-bold text-white mb-4">Bem-vindo ao Shibuya Hub!</h2>
+                            <p>Este tutorial irá guiá-lo através de todas as funcionalidades disponíveis para que você possa gerenciar seus projetos de edição com eficiência.</p>
+                        </div>
 
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h3 class="text-xl font-bold text-blue-400 mb-3">Dashboard (Visão Geral)</h3>
-                              <p class="mb-2">Esta é a sua tela inicial. Aqui você vê todos os seus projetos em formato de "cards".</p>
-                              <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                  <li><strong>Cards de Projeto:</strong> Cada card mostra o nome do projeto, cliente, valor e o prazo de entrega. A cor da borda indica o status do prazo (verde para tranquilo, amarelo para próximo, vermelho para atrasado).</li>
-                                  <li><strong>Status das Etapas:</strong> Você pode alterar o status de cada etapa (Storyboard, Recortes, Câmera, CC) diretamente no card.</li>
-                                  <li><strong>Progresso:</strong> Arraste a barra de progresso para atualizar o quão completo está o projeto.</li>
-                                  <li><strong>Ações Rápidas:</strong> Use os botões para concluir o projeto, salvá-lo como um template para uso futuro, compartilhar com o cliente ou deletar o projeto.</li>
-                                  <li><strong>Ficheiros e Comentários:</strong> Anexe arquivos importantes e veja os comentários recentes diretamente no card.</li>
-                              </ul>
-                          </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Dashboard (Visão Geral)</h3>
+                            <p class="mb-2">Esta é a sua tela inicial. Aqui você vê todos os seus projetos em formato de "cards".</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Cards de Projeto:</strong> Cada card mostra o nome do projeto, cliente, valor e o prazo de entrega. A cor da borda indica o status do prazo (verde para tranquilo, amarelo para próximo, vermelho para atrasado).</li>
+                                <li><strong>Status das Etapas:</strong> Você pode alterar o status de cada etapa (Storyboard, Recortes, Câmera, CC) diretamente no card.</li>
+                                <li><strong>Progresso:</strong> Arraste a barra de progresso para atualizar o quão completo está o projeto.</li>
+                                <li><strong>Ações Rápidas:</strong> Use os botões para concluir o projeto, salvá-lo como um template para uso futuro, compartilhar com o cliente ou deletar o projeto.</li>
+                                <li><strong>Ficheiros e Comentários:</strong> Anexe arquivos importantes e veja os comentários recentes diretamente no card.</li>
+                            </ul>
+                        </div>
 
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Projetos</h3>
-                              <p class="mb-2">É aqui que a mágica começa. Adicione novos projetos preenchendo o formulário.</p>
-                               <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                   <li><strong>Formulário:</strong> Insira os detalhes básicos como nome, cliente, prazo e valor.</li>
-                                   <li><strong>Templates:</strong> Se você já salvou um projeto como template, pode selecioná-lo no menu "Usar Template" para preencher automaticamente as informações de status e valor.</li>
-                                   <li><strong>Status Iniciais:</strong> Defina o estado inicial para cada etapa do novo projeto.</li>
-                               </ul>
-                          </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Projetos</h3>
+                            <p class="mb-2">É aqui que a mágica começa. Adicione novos projetos preenchendo o formulário.</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Formulário:</strong> Insira os detalhes básicos como nome, cliente, prazo e valor.</li>
+                                <li><strong>Templates:</strong> Se você já salvou um projeto como template, pode selecioná-lo no menu "Usar Template" para preencher automaticamente as informações de status e valor.</li>
+                                <li><strong>Status Iniciais:</strong> Defina o estado inicial para cada etapa do novo projeto.</li>
+                            </ul>
+                        </div>
 
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Portfólios</h3>
-                              <p class="mb-2">Esta área é para se conectar com a comunidade.</p>
-                               <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                   <li><strong>Meu Portfólio:</strong> Preencha suas informações para que outros editores e potenciais clientes possam encontrar você. Adicione seu nome, link para o portfólio, especialidades e informações de preço.</li>
-                                   <li><strong>Encontrar Editores:</strong> Procure por outros editores usando a barra de busca ou os filtros de especialidade. É uma ótima maneira de encontrar parceiros para projetos ou se inspirar.</li>
-                               </ul>
-                          </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Portfólios</h3>
+                            <p class="mb-2">Esta área é para se conectar com a comunidade.</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Meu Portfólio:</strong> Preencha suas informações para que outros editores e potenciais clientes possam encontrar você. Adicione seu nome, link para o portfólio, especialidades e informações de preço.</li>
+                                <li><strong>Encontrar Editores:</strong> Procure por outros editores usando a barra de busca ou os filtros de especialidade. É uma ótima maneira de encontrar parceiros para projetos ou se inspirar.</li>
+                            </ul>
+                        </div>
 
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Financeiro</h3>
-                              <p class="mb-2">Tenha uma visão clara dos seus ganhos.</p>
-                               <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                   <li><strong>Painéis de Ganhos:</strong> Veja o total ganho com projetos já concluídos e o valor potencial dos projetos que ainda estão em andamento.</li>
-                                   <li><strong>Gráfico de Ganhos Mensais:</strong> O gráfico de barras mostra seus ganhos mensais com base na data de entrega dos projetos concluídos, ajudando você a visualizar sua performance ao longo do tempo.</li>
-                               </ul>
-                          </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Financeiro</h3>
+                            <p class="mb-2">Tenha uma visão clara dos seus ganhos.</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Painéis de Ganhos:</strong> Veja o total ganho com projetos já concluídos e o valor potencial dos projetos que ainda estão em andamento.</li>
+                                <li><strong>Gráfico de Ganhos Mensais:</strong> O gráfico de barras mostra seus ganhos mensais com base na data de entrega dos projetos concluídos, ajudando você a visualizar sua performance ao longo do tempo.</li>
+                            </ul>
+                        </div>
                             
-                           <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Comunidade</h3>
-                              <p class="mb-2">Uma área para a comunidade de editores. Encontre tutoriais, dicas e compartilhe seus próprios conhecimentos.</p>
-                              <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                   <li><strong>Tutoriais Recomendados:</strong> Descubra tutoriais e recursos valiosos para aprimorar suas habilidades de edição, especialmente para MMVs e edits de rap geek.</li>
-                                   <li><strong>Compartilhar Conhecimento:</strong> Use o formulário abaixo para enviar um link de um tutorial ou recurso que você achou útil. A comunidade agradece!</li>
-                               </ul>
-                          </div>
+                        <!-- NEW: Resources Tab -->
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Comunidade</h3>
+                            <p class="mb-2">Uma área para a comunidade de editores. Encontre tutoriais, dicas e compartilhe seus próprios conhecimentos.</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Tutoriais Recomendados:</strong> Descubra tutoriais e recursos valiosos para aprimorar suas habilidades de edição, especialmente para MMVs e edits de rap geek.</li>
+                                <li><strong>Compartilhar Conhecimento:</strong> Use o formulário abaixo para enviar um link de um tutorial ou recurso que você achou útil. A comunidade agradece!</li>
+                            </ul>
+                        </div>
                             
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Calculadora</h3>
-                              <p class="mb-2">Ferramentas úteis para o dia a dia.</p>
-                               <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                   <li><strong>Calculadora de Preço por Tempo:</strong> Não sabe quanto cobrar por um vídeo de 2 minutos e 30 segundos? Insira seu preço por minuto e a duração do vídeo para obter o valor total instantaneamente.</li>
-                                   <li><strong>Calculadora de Desconto por Atraso:</strong> Se você tem uma política de descontos por atraso na entrega, esta calculadora ajuda a determinar o valor final, aplicando uma porcentagem de desconto por cada dia de atraso.</li>
-                               </ul>
-                          </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Calculadora</h3>
+                            <p class="mb-2">Ferramentas úteis para o dia a dia.</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Calculadora de Preço por Tempo:</strong> Não sabe quanto cobrar por um vídeo de 2 minutos e 30 segundos? Insira seu preço por minuto e a duração do vídeo para obter o valor total instantaneamente.</li>
+                                <li><strong>Calculadora de Desconto por Atraso:</strong> Se você tem uma política de descontos por atraso na entrega, esta calculadora ajuda a determinar o valor final, aplicando uma porcentagem de desconto por cada dia de atraso.</li>
+                            </ul>
+                        </div>
                             
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                              <h3 class="text-xl font-bold text-blue-400 mb-3">Portal do Cliente</h3>
-                              <p class="mb-2">Compartilhe o progresso com seus clientes de forma profissional.</p>
-                               <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                   <li><strong>Como compartilhar:</strong> No card do projeto, clique no ícone de compartilhamento (três pontos conectados). Isso copiará um link único para a sua área de transferência.</li>
-                                   <li><strong>O que o cliente vê:</strong> Ao acessar o link, seu cliente verá uma página dedicada ao projeto dele, com o progresso geral, status de cada etapa, arquivos para download e uma caixa de comentários para feedback. Tudo isso sem precisar de login!</li>
-                               </ul>
-                          </div>
-                      </div>
-                 </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Portal do Cliente</h3>
+                            <p class="mb-2">Compartilhe o progresso com seus clientes de forma profissional.</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Como compartilhar:</strong> No card do projeto, clique no ícone de compartilhamento (três pontos conectados). Isso copiará um link único para a sua área de transferência.</li>
+                                <li><strong>O que o cliente vê:</strong> Ao acessar o link, seu cliente verá uma página dedicada ao projeto dele, com o progresso geral, status de cada etapa, arquivos para download e uma caixa de comentários para feedback. Tudo isso sem precisar de login!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
             <footer class="text-center py-6 text-sm text-gray-500">
                 <p>FEITO POR @LUCXSEDIITS</p>
@@ -540,13 +543,11 @@
         </div>
     
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDoc, setLogLevel, arrayUnion, writeBatch, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDoc, setLogLevel, arrayUnion, writeBatch, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         
-        // --- Your web app's Firebase configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBe14b2ITHUch8-LytK5ZrtCgfvxUFrq8s",
             authDomain: "mmvhub-56702.firebaseapp.com",
@@ -556,7 +557,6 @@
             appId: "1:786807517566:web:6e29c5e2d5d13203c9032f"
         };
 
-        // --- FIREBASE INITIALIZATION ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -569,17 +569,19 @@
         let allPublicPortfolios = [];
         let allCommunityResources = [];
         let reminders = [];
-        let messages = [];
-        let activePortfolioFilters = new Set();
-        let activeCommunityFilters = new Set();
+        let allUsers = [];
+        let activeConversations = [];
         let currentUserId = null;
-        let userProfile = {};
+        let currentUserProfile = {};
+        let currentChatUser = null;
         let unsubscribeFromProjects = null;
         let unsubscribeFromTemplates = null;
         let unsubscribeFromPortfolios = null;
         let unsubscribeFromProfile = null;
         let unsubscribeFromReminders = null;
-        let unsubscribeFromMessages = null;
+        let unsubscribeFromUsers = null;
+        let unsubscribeFromConversations = null;
+        let unsubscribeFromCurrentChat = null;
         let noteUpdateTimeout = null;
         let monthlyIncomeChart = null;
         let timeUpdateInterval = null;
@@ -589,7 +591,9 @@
         let calendar = null;
         let isEditing = false;
         let currentEditProjectId = null;
-
+        let activePortfolioFilters = new Set();
+        let activeCommunityFilters = new Set();
+        
         // --- DOM ELEMENTS ---
         const notification = document.getElementById('notification');
         const confirmationModal = document.getElementById('confirmation-modal');
@@ -648,8 +652,20 @@
         const searchCommunityInput = document.getElementById('search-community-input');
         const communityTagsFilter = document.getElementById('community-tags-filter');
         const addReminderForm = document.getElementById('add-reminder-form');
-        const messagesContainer = document.getElementById('messages-container');
+        const usersList = document.getElementById('users-list');
+        const conversationList = document.getElementById('conversation-list');
+        const searchUsersInput = document.getElementById('search-users-input');
+        const searchedUsers = document.getElementById('searched-users');
+        const chatArea = document.getElementById('chat-area');
+        const noChatSelected = document.getElementById('no-chat-selected');
+        const chatMessages = document.getElementById('chat-messages');
         const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const chatUserName = document.getElementById('chat-user-name');
+        const requestPending = document.getElementById('request-pending');
+        const requestReceived = document.getElementById('request-received');
+        const acceptChatBtn = document.getElementById('accept-chat-btn');
+        let currentConversationId = null;
 
         // --- PAGE LOAD ROUTING ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -710,7 +726,7 @@
             confirmCallback = onConfirm;
             confirmationModal.style.display = 'flex';
             setTimeout(() => {
-                 modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.remove('scale-95', 'opacity-0');
             }, 10);
         };
 
@@ -747,7 +763,8 @@
                 listenToPortfolios();
                 listenToResources();
                 listenToReminders();
-                listenToMessages();
+                listenToUsers();
+                listenToConversations();
                 loadMyPortfolio();
                 
                 if (timeUpdateInterval) clearInterval(timeUpdateInterval);
@@ -769,13 +786,16 @@
                 if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
                 if (unsubscribeFromResources) unsubscribeFromResources();
                 if (unsubscribeFromReminders) unsubscribeFromReminders();
-                if (unsubscribeFromMessages) unsubscribeFromMessages();
+                if (unsubscribeFromUsers) unsubscribeFromUsers();
+                if (unsubscribeFromConversations) unsubscribeFromConversations();
+                if (unsubscribeFromCurrentChat) unsubscribeFromCurrentChat();
                 if (unsubscribeFromProfile) unsubscribeFromProfile();
                 projects = [];
                 projectTemplates = [];
                 allCommunityResources = [];
                 reminders = [];
-                messages = [];
+                activeConversations = [];
+                allUsers = [];
                 renderDashboardCards();
                 renderProjectLists();
                 portfoliosContainer.innerHTML = '';
@@ -792,19 +812,41 @@
                 });
         });
 
-        signupForm.addEventListener('submit', (e) => {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const username = document.getElementById('signup-username').value.trim();
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .catch(error => {
-                    switch (error.code) {
-                        case 'auth/email-already-in-use': signupErrorMsg.textContent = "Este email já está em uso."; break;
-                        case 'auth/invalid-email': signupErrorMsg.textContent = "O formato do email é inválido."; break;
-                        case 'auth/weak-password': signupErrorMsg.textContent = "A senha é muito fraca (mínimo 6 caracteres)."; break;
-                        default: signupErrorMsg.textContent = "Ocorreu um erro ao criar a conta."; break;
-                    }
+
+            if (username.length < 3) {
+                signupErrorMsg.textContent = "O nome de usuário deve ter no mínimo 3 caracteres.";
+                return;
+            }
+
+            try {
+                // Check if username is already taken
+                const usernameQuery = query(collection(db, 'users'), where('username', '==', username));
+                const querySnapshot = await getDocs(usernameQuery);
+                if (!querySnapshot.empty) {
+                    signupErrorMsg.textContent = "Este nome de usuário já está em uso.";
+                    return;
+                }
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, 'users', userCredential.user.uid), {
+                    username: username,
+                    email: email,
+                    createdAt: serverTimestamp(),
+                    deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
                 });
+            } catch (error) {
+                switch (error.code) {
+                    case 'auth/email-already-in-use': signupErrorMsg.textContent = "Este email já está em uso."; break;
+                    case 'auth/invalid-email': signupErrorMsg.textContent = "O formato do email é inválido."; break;
+                    case 'auth/weak-password': signupErrorMsg.textContent = "A senha é muito fraca (mínimo 6 caracteres)."; break;
+                    default: signupErrorMsg.textContent = "Ocorreu um erro ao criar a conta."; break;
+                }
+            }
         });
 
         logoutBtn.addEventListener('click', () => signOut(auth));
@@ -827,33 +869,38 @@
             const userDocRef = doc(db, 'users', user.uid);
             unsubscribeFromProfile = onSnapshot(userDocRef, async (docSnap) => {
                 if (!docSnap.exists()) {
-                    const defaultProfile = {
-                        email: user.email, bio: '', photoURL: '',
+                    await setDoc(userDocRef, {
+                        email: user.email,
+                        username: user.email.split('@')[0],
+                        deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
+                    });
+                    currentUserProfile = {
+                        email: user.email,
+                        username: user.email.split('@')[0],
                         deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
                     };
-                    await setDoc(userDocRef, defaultProfile);
-                    userProfile = defaultProfile;
                 } else {
-                    userProfile = docSnap.data();
+                    currentUserProfile = docSnap.data();
                 }
                 renderProfileUI();
                 applyCustomColors();
+                pageTitle.textContent = 'Olá, ' + (currentUserProfile.username || 'Usuário');
             });
         };
 
         const renderProfileUI = () => {
-            if (!userProfile) return;
-            document.getElementById('profile-bio').value = userProfile.bio || '';
-            document.getElementById('profile-pic-preview').src = userProfile.photoURL || 'https://placehold.co/100x100/161b22/c9d1d9?text=Foto';
-            if (userProfile.deadlineColors) {
-                document.getElementById('color-ok').value = userProfile.deadlineColors.ok;
-                document.getElementById('color-warning').value = userProfile.deadlineColors.warning;
-                document.getElementById('color-danger').value = userProfile.deadlineColors.danger;
+            if (!currentUserProfile) return;
+            document.getElementById('profile-bio').value = currentUserProfile.bio || '';
+            document.getElementById('profile-pic-preview').src = currentUserProfile.photoURL || 'https://placehold.co/100x100/161b22/c9d1d9?text=Foto';
+            if (currentUserProfile.deadlineColors) {
+                document.getElementById('color-ok').value = currentUserProfile.deadlineColors.ok;
+                document.getElementById('color-warning').value = currentUserProfile.deadlineColors.warning;
+                document.getElementById('color-danger').value = currentUserProfile.deadlineColors.danger;
             }
         };
 
         const applyCustomColors = () => {
-            if (!userProfile.deadlineColors) return;
+            if (!currentUserProfile.deadlineColors) return;
             let customStyle = document.getElementById('custom-colors-style');
             if (!customStyle) {
                 customStyle = document.createElement('style');
@@ -861,9 +908,9 @@
                 document.head.appendChild(customStyle);
             }
             customStyle.innerHTML = `
-                .border-green-500 { border-color: ${userProfile.deadlineColors.ok} !important; }
-                .border-yellow-400, .border-yellow-500 { border-color: ${userProfile.deadlineColors.warning} !important; }
-                .border-red-500 { border-color: ${userProfile.deadlineColors.danger} !important; }
+                .border-green-500 { border-color: ${currentUserProfile.deadlineColors.ok} !important; }
+                .border-yellow-400, .border-yellow-500 { border-color: ${currentUserProfile.deadlineColors.warning} !important; }
+                .border-red-500 { border-color: ${currentUserProfile.deadlineColors.danger} !important; }
             `;
         };
 
@@ -895,7 +942,7 @@
                 const updatedProfileData = {
                     bio: newBio,
                     deadlineColors: newColors,
-                    photoURL: userProfile.photoURL || ''
+                    photoURL: currentUserProfile.photoURL || ''
                 };
 
                 if (file) {
@@ -918,7 +965,8 @@
         const getTemplatesCollectionPath = () => currentUserId ? `users/${currentUserId}/templates` : null;
         const getResourcesCollectionPath = () => 'resources';
         const getRemindersCollectionPath = () => currentUserId ? `users/${currentUserId}/reminders` : null;
-        const getMessagesCollectionPath = () => currentUserId ? `messages` : null;
+        const getConversationsCollectionPath = () => 'conversations';
+        const getUsersCollectionPath = () => 'users';
 
 
         const listenToProjects = () => {
@@ -951,71 +999,167 @@
             if (unsubscribeFromReminders) unsubscribeFromReminders();
             const path = getRemindersCollectionPath();
             if (!path) return;
-            unsubscribeFromReminders = onSnapshot(query(collection(db, path), orderBy('timestamp')), (snapshot) => {
+            unsubscribeFromReminders = onSnapshot(query(collection(db, path)), (snapshot) => {
                 reminders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 generateAndRenderNotifications();
             });
         };
+
+        const listenToUsers = () => {
+            if (unsubscribeFromUsers) unsubscribeFromUsers();
+            unsubscribeFromUsers = onSnapshot(collection(db, getUsersCollectionPath()), (snapshot) => {
+                allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderUsersList();
+            });
+        }
         
-        const listenToMessages = () => {
-            if (unsubscribeFromMessages) unsubscribeFromMessages();
+        const listenToConversations = () => {
+            if (unsubscribeFromConversations) unsubscribeFromConversations();
             if (!currentUserId) return;
-            const path = getMessagesCollectionPath();
-            if (!path) return;
-            const q = query(collection(db, path), where('participants', 'array-contains', currentUserId), orderBy('timestamp'));
-            unsubscribeFromMessages = onSnapshot(q, (snapshot) => {
-                messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderMessages();
+            const q = query(collection(db, getConversationsCollectionPath()), where('participants', 'array-contains', currentUserId));
+            unsubscribeFromConversations = onSnapshot(q, (snapshot) => {
+                activeConversations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderConversationList();
             });
         };
 
-        const renderMessages = () => {
-            messagesContainer.innerHTML = '';
-            if (messages.length === 0) {
-                messagesContainer.innerHTML = `<p class="text-center text-gray-500">Nenhuma conversa encontrada.</p>`;
-                return;
+        const listenToCurrentChat = (conversationId) => {
+             if (unsubscribeFromCurrentChat) unsubscribeFromCurrentChat();
+             const q = query(collection(db, getConversationsCollectionPath(), conversationId, 'messages'));
+             unsubscribeFromCurrentChat = onSnapshot(q, (snapshot) => {
+                 const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                 renderChatMessages(messages);
+             });
+        }
+
+        const renderConversationList = () => {
+            conversationList.innerHTML = '';
+            if (activeConversations.length === 0) {
+                 conversationList.innerHTML = `<p class="text-gray-500">Nenhuma conversa ativa.</p>`;
             }
+
+            activeConversations.forEach(conv => {
+                const otherParticipantId = conv.participants.find(id => id !== currentUserId);
+                const otherUser = allUsers.find(u => u.id === otherParticipantId);
+                const otherUsername = otherUser ? otherUser.username : 'Usuário Desconhecido';
+                const status = conv.status || 'accepted';
+                const statusText = status === 'pending' && conv.requesterId === currentUserId ? 'Enviado' :
+                                       status === 'pending' && conv.requesterId !== currentUserId ? 'Solicitação' : '';
+
+                const item = document.createElement('button');
+                item.className = 'w-full text-left p-3 rounded-lg hover:bg-[#30363d] conversation-item';
+                item.dataset.id = conv.id;
+                item.dataset.otherUserId = otherUser ? otherUser.id : '';
+                item.dataset.otherUsername = otherUsername;
+                item.innerHTML = `
+                    <p class="font-bold">${otherUsername} ${statusText ? `<span class="text-xs text-yellow-400">(${statusText})</span>` : ''}</p>
+                    <p class="text-sm text-gray-400 truncate">${conv.lastMessage || 'Nenhuma mensagem.'}</p>
+                `;
+                conversationList.appendChild(item);
+            });
+        };
+
+        const renderChatArea = (conversationId, otherUser, conversationStatus) => {
+            chatArea.style.display = 'flex';
+            noChatSelected.style.display = 'none';
+            chatUserName.textContent = otherUser.username;
+            messageForm.dataset.conversationId = conversationId;
+            currentConversationId = conversationId;
+
+            requestPending.style.display = 'none';
+            requestReceived.style.display = 'none';
+            messageForm.style.display = 'none';
+            messageInput.disabled = false;
+
+            if (conversationStatus === 'pending') {
+                if (otherUser.id === currentUserProfile.id) {
+                    requestReceived.style.display = 'block';
+                } else {
+                    requestPending.style.display = 'block';
+                }
+            } else {
+                 messageForm.style.display = 'flex';
+                 listenToCurrentChat(conversationId);
+            }
+        };
+
+        const renderChatMessages = (messages) => {
+            chatMessages.innerHTML = '';
             messages.forEach(msg => {
                 const isSent = msg.senderId === currentUserId;
                 const bubbleClass = isSent ? 'sent' : 'received';
-                const alignmentClass = isSent ? 'ml-auto' : 'mr-auto';
+                const containerClass = isSent ? 'justify-end' : 'justify-start';
                 const timestamp = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleString('pt-BR') : '';
-                const bubble = document.createElement('div');
-                bubble.className = `chat-bubble ${bubbleClass} ${alignmentClass}`;
-                bubble.innerHTML = `
-                    <div class="flex flex-col">
-                        <p>${msg.text}</p>
-                        <span class="text-[10px] opacity-70 mt-1 self-end">${timestamp}</span>
+                chatMessages.innerHTML += `
+                    <div class="flex ${containerClass}">
+                        <div class="chat-bubble ${bubbleClass}">
+                            <p class="text-sm">${msg.text}</p>
+                            <span class="text-[10px] opacity-70 mt-1 ml-2 self-end">${timestamp}</span>
+                        </div>
                     </div>
                 `;
-                messagesContainer.appendChild(bubble);
             });
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        const handleStartChat = async (otherUserId) => {
+            const existingConversation = activeConversations.find(conv => conv.participants.includes(otherUserId));
+            if (existingConversation) {
+                const otherUser = allUsers.find(u => u.id === otherUserId);
+                renderChatArea(existingConversation.id, otherUser, existingConversation.status);
+                return;
+            }
+
+            const newConversationRef = await addDoc(collection(db, getConversationsCollectionPath()), {
+                participants: [currentUserId, otherUserId],
+                status: 'pending',
+                requesterId: currentUserId,
+                lastMessage: 'Solicitação de chat enviada.',
+                updatedAt: serverTimestamp()
+            });
+             const otherUser = allUsers.find(u => u.id === otherUserId);
+             renderChatArea(newConversationRef.id, otherUser, 'pending');
+        }
+
+        const handleAcceptChat = async () => {
+             if (!currentConversationId) return;
+             try {
+                 await updateDoc(doc(db, getConversationsCollectionPath(), currentConversationId), {
+                     status: 'accepted',
+                     lastMessage: 'Conversa aceita!'
+                 });
+                 showNotification("Conversa aceita! Você já pode conversar.");
+             } catch (error) {
+                 console.error("Erro ao aceitar conversa:", error);
+                 showNotification("Erro ao aceitar a conversa.", true);
+             }
         };
 
         const handleMessageSubmission = async (e) => {
             e.preventDefault();
-            if (!currentUserId) return;
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
+            if (!currentUserId || !currentConversationId) return;
+            const text = messageInput.value.trim();
             if (!text) return;
 
             const messageData = {
                 text,
                 senderId: currentUserId,
                 timestamp: serverTimestamp(),
-                participants: ['adminId', currentUserId]
             };
 
             try {
-                await addDoc(collection(db, getMessagesCollectionPath()), messageData);
-                input.value = '';
+                const messagesRef = collection(db, `${getConversationsCollectionPath()}/${currentConversationId}/messages`);
+                await addDoc(messagesRef, messageData);
+                await updateDoc(doc(db, getConversationsCollectionPath(), currentConversationId), {
+                    lastMessage: text,
+                    updatedAt: serverTimestamp()
+                });
+                messageInput.value = '';
             } catch (error) {
                 console.error("Error sending message: ", error);
                 showNotification("Erro ao enviar a mensagem.", true);
             }
         };
-
 
         const listenToPortfolios = () => {
             if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
@@ -1124,7 +1268,7 @@
                 container.innerHTML = `<p class="text-center md:col-span-2 xl:col-span-3 2xl:col-span-4 text-gray-500">Nenhum projeto encontrado.</p>`;
                 return;
             }
-        
+            
             const sortedProjects = [...projectList].sort((a, b) => {
                 if (a.order !== undefined && b.order !== undefined) {
                     return a.order - b.order;
@@ -1133,7 +1277,7 @@
                 const bDays = calculateDaysLeft(b.deadline).days;
                 return aDays - bDays;
             });
-        
+            
             sortedProjects.forEach(project => {
                 const deadlineInfo = calculateDaysLeft(project.deadline);
                 const isCompleted = project.progress == 100;
@@ -1173,12 +1317,12 @@
                             <h3 class="text-xl font-bold text-white">${project.name}</h3>
                             <div class="flex items-center gap-2">
                                 <button class="edit-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Editar Projeto">
-                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                                 </button>
-                                 <button class="share-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Partilhar com Cliente">
-                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                                 </button>
-                                 <button class="delete-project-btn text-gray-500 hover:text-red-500 transition-colors font-bold text-lg" data-id="${project.id}">&times;</button>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                </button>
+                                <button class="share-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Partilhar com Cliente">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                                </button>
+                                <button class="delete-project-btn text-gray-500 hover:text-red-500 transition-colors font-bold text-lg" data-id="${project.id}">&times;</button>
                             </div>
                         </div>
                         <p class="text-sm text-gray-400 mb-1">Cliente: ${project.client || 'N/A'}</p>
@@ -1517,7 +1661,7 @@
                 const card = document.createElement('div');
                 card.className = 'bg-[#161b22] border border-[#30363d] p-5 rounded-xl shadow-lg transition-transform hover:-translate-y-1';
                 card.innerHTML = `
-                    <h3 class="text-xl font-bold text-blue-400">${portfolio.editorName}</h3>
+                    <button class="text-xl font-bold text-blue-400 portfolio-username-btn" data-id="${portfolio.userId}">${portfolio.editorName}</button>
                     <p class="text-sm mt-2 mb-3">Especialidades: ${portfolio.specialties}</p>
                     <p class="text-sm mb-4 font-semibold">Preços: ${portfolio.priceInfo}</p>
                     <a href="${portfolio.portfolioLink}" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Ver Portfólio</a>
@@ -1925,6 +2069,22 @@
                 }
             });
 
+            // New: Notifications for pending chat requests
+            activeConversations.forEach(conv => {
+                if (conv.status === 'pending' && conv.requesterId !== currentUserId) {
+                    const otherUser = allUsers.find(u => u.id === conv.requesterId);
+                    if (otherUser) {
+                        notifications.push({
+                            message: `Solicitação de chat de ${otherUser.username}`,
+                            isUrgent: false,
+                            isChatRequest: true,
+                            id: conv.id
+                        });
+                    }
+                }
+            });
+
+
             notificationBadge.style.display = notifications.length > 0 ? 'flex' : 'none';
             notificationBadge.textContent = notifications.length;
 
@@ -1933,9 +2093,10 @@
                     <div class="p-2 border-b border-[#30363d] text-sm ${n.isUrgent ? 'text-red-400' : ''} flex justify-between items-center">
                         <div>
                             <p>${n.message}</p>
-                            <p class="text-[10px] text-gray-500">${new Date(n.date).toLocaleString('pt-BR')}</p>
+                            <p class="text-[10px] text-gray-500">${n.date ? new Date(n.date).toLocaleString('pt-BR') : ''}</p>
                         </div>
                         ${n.isReminder ? `<button class="dismiss-reminder-btn text-gray-500 hover:text-white" data-id="${n.id}">&times;</button>` : ''}
+                        ${n.isChatRequest ? `<button class="view-chat-request-btn text-blue-400 hover:text-blue-200" data-id="${n.id}">Ver</button>` : ''}
                     </div>
                 `).join('')
                 : '<div class="p-2 text-sm text-center text-gray-500">Nenhuma notificação.</div>';
@@ -1976,10 +2137,10 @@
                     </a>`).join('') || '<p class="text-gray-400">Nenhum ficheiro disponível.</p>';
                 
                 const commentsHTML = (project.comments || []).map(comment => `
-                             <div class="p-3 rounded-lg ${comment.author === 'Editor' ? 'bg-blue-900/40 ml-auto' : 'bg-gray-700/40 mr-auto'}" style="max-width: 80%;">
-                                 <p class="text-sm">${comment.text}</p>
-                                 <p class="text-gray-400 text-[11px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
-                             </div>
+                                     <div class="p-3 rounded-lg ${comment.author === 'Editor' ? 'bg-blue-900/40 ml-auto' : 'bg-gray-700/40 mr-auto'}" style="max-width: 80%;">
+                                         <p class="text-sm">${comment.text}</p>
+                                         <p class="text-gray-400 text-[11px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
+                                     </div>
                 `).join('');
 
                 let approvalSectionHTML = '';
@@ -2110,11 +2271,11 @@
                      const newComment = { text: feedback, author: 'Cliente', timestamp: new Date() };
                      updateData.comments = arrayUnion(newComment);
                      try {
-                         await updateDoc(projectDocRef, updateData);
-                         showNotification("Etapa rejeitada. Feedback enviado.");
+                          await updateDoc(projectDocRef, updateData);
+                          showNotification("Etapa rejeitada. Feedback enviado.");
                      } catch (err) {
-                         console.error("Erro ao rejeitar etapa: ", err);
-                         showNotification("Erro ao rejeitar etapa.", true);
+                          console.error("Erro ao rejeitar etapa: ", err);
+                          showNotification("Erro ao rejeitar etapa.", true);
                      }
                 });
             });
@@ -2132,32 +2293,51 @@
             }
         });
          document.body.addEventListener('change', (e) => {
-            if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
-                handleProjectInteraction(e);
-            }
+             if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
+                 handleProjectInteraction(e);
+             }
         });
          document.body.addEventListener('click', (e) => {
-            if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
-                const target = e.target;
-                const button = target.closest('button');
-                const projectId = target.dataset.id || button?.dataset.id || target.closest('[data-id]')?.dataset.id;
-                const project = projects.find(p => p.id === projectId);
-                if (button && button.classList.contains('edit-project-btn')) {
-                    if (project) {
-                        openEditModal(project);
-                    }
-                } else {
-                    handleProjectInteraction(e);
-                }
-            }
-            
-            if (e.target.closest('#community-tags-filter')) {
-                handleCommunityTagClick(e);
-            }
-            
-            if (e.target.classList.contains('dismiss-reminder-btn')) {
-                handleDismissReminder(e.target.dataset.id);
-            }
+             if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
+                 const target = e.target;
+                 const button = target.closest('button');
+                 const projectId = target.dataset.id || button?.dataset.id || target.closest('[data-id]')?.dataset.id;
+                 const project = projects.find(p => p.id === projectId);
+                 if (button && button.classList.contains('edit-project-btn')) {
+                     if (project) {
+                         openEditModal(project);
+                     }
+                 } else {
+                     handleProjectInteraction(e);
+                 }
+             }
+             
+             if (e.target.closest('#community-tags-filter')) {
+                 handleCommunityTagClick(e);
+             }
+             
+             if (e.target.classList.contains('dismiss-reminder-btn')) {
+                 handleDismissReminder(e.target.dataset.id);
+             }
+
+             if (e.target.closest('.portfolio-username-btn')) {
+                 const otherUserId = e.target.closest('.portfolio-username-btn').dataset.id;
+                 handleStartChat(otherUserId);
+             }
+
+             if (e.target.closest('.conversation-item')) {
+                  const convId = e.target.closest('.conversation-item').dataset.id;
+                  const otherUserId = e.target.closest('.conversation-item').dataset.otherUserId;
+                  const otherUsername = e.target.closest('.conversation-item').dataset.otherUsername;
+                  const conversation = activeConversations.find(c => c.id === convId);
+                  if (conversation) {
+                      renderChatArea(convId, { id: otherUserId, username: otherUsername }, conversation.status);
+                  }
+             }
+
+             if (e.target.id === 'accept-chat-btn') {
+                 handleAcceptChat();
+             }
         });
 
         calculatePriceBtn.addEventListener('click', handleCalculatePrice);
@@ -2169,6 +2349,7 @@
         portfolioFilters.addEventListener('click', handlePortfolioFilterClick);
         searchCommunityInput.addEventListener('input', applyCommunityFiltersAndRender);
         messageForm.addEventListener('submit', handleMessageSubmission);
+        searchUsersInput.addEventListener('input', renderUsersList);
 
         searchProjectsInput.addEventListener('input', (e) => {
             projectSearchTerm = e.target.value.toLowerCase();
@@ -2216,7 +2397,6 @@
         });
 
         switchTab('dashboard');
-
     </script>
 </body>
 </html>
