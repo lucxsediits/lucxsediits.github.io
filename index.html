@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Using a more modern approach by leveraging TailwindCSS classes directly in the HTML. 
-           Custom CSS is kept to a minimum for things Tailwind can't easily handle. */
+            Custom CSS is kept to a minimum for things Tailwind can't easily handle. */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d1117; /* A deep, modern dark background */
@@ -46,13 +46,17 @@
 
         /* Animations */
         .card-enter {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 300ms ease-out, transform 300ms ease-out;
+            animation: card-enter-anim 300ms ease-out forwards;
         }
-        .card-enter-active {
-            opacity: 1;
-            transform: translateY(0);
+        @keyframes card-enter-anim {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .highlight {
             animation: highlight-anim 1.5s ease-out;
@@ -155,13 +159,19 @@
                  <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="calculator" title="Calculadora">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="8" y2="14"></line><line x1="16" y1="18" x2="8" y2="18"></line><line x1="10" y1="10" x2="14" y2="10"></line></svg>
                  </button>
-                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="tutorial" title="Tutorial">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="community" title="Comunidade">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                  </button>
             </div>
             <div class="mt-auto flex flex-col space-y-4">
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="messages" title="Mensagens">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                 </button>
                  <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="profile" title="Perfil">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                 </button>
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="tutorial" title="Tutorial">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
                  </button>
                  <button id="logout-btn" class="p-3 rounded-lg text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Sair">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -175,8 +185,8 @@
                  <h1 id="page-title" class="text-3xl font-bold text-white">Visão Geral</h1>
                  <div class="relative">
                      <button id="notifications-btn" class="text-gray-400 hover:text-white transition-colors relative">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;"></span>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                         <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;"></span>
                      </button>
                      <div id="notifications-panel" class="absolute right-0 mt-2 w-80 bg-[#161b22] border border-[#30363d] rounded-lg shadow-2xl p-3 z-10" style="display: none;"></div>
                  </div>
@@ -281,8 +291,8 @@
                             <h2 class="text-2xl font-bold mb-4 text-white">Encontrar Editores</h2>
                             <input type="search" id="search-portfolio-input" placeholder="Buscar por nome ou especialidade..." class="w-full p-3 mb-4 bg-[#161b22] border border-[#30363d] rounded-lg">
                             <div id="portfolio-filters" class="flex flex-wrap gap-2 mb-6">
-                                <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="MMV">MMV</button>
-                                <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="AMV">AMV</button>
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-filter="MMV">MMV</button>
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-filter="AMV">AMV</button>
                                 <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="Lyric">Lyric</button>
                             </div>
                             <div id="portfolios-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -299,8 +309,8 @@
                             <p id="total-earned" class="text-4xl font-bold text-green-400 mt-2">R$ 0.00</p>
                         </div>
                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl text-center">
-                            <h3 class="text-lg">Potencial (Em Andamento)</h3>
-                            <p id="total-potential" class="text-4xl font-bold text-yellow-400 mt-2">R$ 0.00</p>
+                             <h3 class="text-lg">Potencial (Em Andamento)</h3>
+                             <p id="total-potential" class="text-4xl font-bold text-yellow-400 mt-2">R$ 0.00</p>
                          </div>
                     </div>
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
@@ -315,7 +325,7 @@
                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                             <h2 class="text-xl font-bold mb-4 text-white">Calculadora de Preço por Tempo</h2>
                             <div class="space-y-3">
-                                <input type="number" id="calc-price-per-minute" placeholder="Preço por minuto (R$)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                <input type="number" id="calc-price-per-minute" placeholder="Preço base por minuto (R$)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
                                 <div class="flex gap-2">
                                     <input type="number" id="calc-minutes" placeholder="Minutos" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
                                     <input type="number" id="calc-seconds" placeholder="Segundos" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
@@ -337,79 +347,194 @@
                     </div>
                 </div>
                  <!-- Profile -->
-                 <div id="profile" class="tab-content max-w-md mx-auto bg-[#161b22] border border-[#30363d] p-8 rounded-xl">
-                     <h2 class="text-2xl font-bold mb-4 text-white">Perfil</h2>
-                     <div>
-                         <p>Email: <span id="user-email" class="font-semibold text-white"></span></p>
-                         <p class="mt-6 text-sm text-gray-400">Funcionalidades como "alterar senha" e "deletar conta" serão adicionadas em breve.</p>
+                 <div id="profile" class="tab-content max-w-2xl mx-auto">
+                     <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl">
+                         <h2 class="text-2xl font-bold mb-6 text-white">Meu Perfil</h2>
+                         <form id="profile-form" class="space-y-6">
+                             <div class="flex items-center gap-6">
+                                 <img id="profile-pic-preview" src="https://placehold.co/100x100/161b22/c9d1d9?text=Foto" class="w-24 h-24 rounded-full object-cover bg-[#0d1117]">
+                                 <div>
+                                     <label for="profile-pic-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                                         Trocar Foto
+                                     </label>
+                                     <input type="file" id="profile-pic-upload" class="hidden" accept="image/*">
+                                 </div>
+                             </div>
+                             
+                             <p>Email: <span id="user-email" class="font-semibold text-white"></span></p>
+
+                             <div>
+                                 <label for="profile-bio" class="block text-sm font-medium mb-2">Biografia</label>
+                                 <textarea id="profile-bio" rows="4" placeholder="Fale um pouco sobre si, suas especialidades e como os clientes podem entrar em contato." class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                             </div>
+
+                             <div class="border-t border-[#30363d] pt-6">
+                                  <h3 class="text-xl font-bold text-white mb-4">Cores de Status do Prazo</h3>
+                                  <p class="text-sm text-gray-400 mb-4">Personalize as cores dos cartões de projeto para se adequar ao seu fluxo de trabalho.</p>
+                                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                      <div>
+                                          <label for="color-ok" class="block text-sm mb-1">Prazo OK</label>
+                                          <input type="color" id="color-ok" value="#22c55e" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
+                                      </div>
+                                      <div>
+                                          <label for="color-warning" class="block text-sm mb-1">Prazo Próximo</label>
+                                          <input type="color" id="color-warning" value="#facc15" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
+                                      </div>
+                                      <div>
+                                          <label for="color-danger" class="block text-sm mb-1">Prazo Atrasado</label>
+                                          <input type="color" id="color-danger" value="#ef4444" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
+                                      </div>
+                                  </div>
+                             </div>
+
+                             <div>
+                                 <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salvar Alterações</button>
+                             </div>
+                         </form>
                      </div>
+                 </div>
+                 <!-- Comunidade -->
+                 <div id="community" class="tab-content max-w-4xl mx-auto space-y-6">
+                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                        <h2 class="text-2xl font-bold mb-4 text-white">Comunidade</h2>
+                        <p class="text-gray-400">Encontre e compartilhe recursos valiosos para aprimorar suas habilidades de edição.</p>
+                        
+                        <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                            <input type="search" id="search-community-input" placeholder="Buscar por título ou tag..." class="w-full sm:w-1/2 p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div id="community-tags-filter" class="flex flex-wrap items-center gap-2">
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="MMV">#MMV</button>
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="After Effects">#After Effects</button>
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="Edits">#Edits</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4">Novo Post</h3>
+                        <form id="share-resource-form" class="space-y-4">
+                            <input type="text" id="resource-title" placeholder="Título do Post" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                            <input type="url" id="resource-link" placeholder="Link (YouTube, Google Drive, etc.)" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                            <input type="text" id="resource-tags" placeholder="Tags (Ex: 'MMV', 'Transição', 'After Effects')" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Fazer Post</button>
+                        </form>
+                    </div>
+
+                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4">Posts da Comunidade</h3>
+                        <div id="community-resources-container" class="space-y-4">
+                            <!-- Resources will be rendered here from Firestore -->
+                        </div>
+                    </div>
                  </div>
                  <!-- Tutorial -->
                  <div id="tutorial" class="tab-content">
-                     <div class="max-w-4xl mx-auto space-y-8">
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h2 class="text-2xl font-bold text-white mb-4">Bem-vindo ao Shibuya Hub!</h2>
-                             <p>Este tutorial irá guiá-lo através de todas as funcionalidades disponíveis para que você possa gerenciar seus projetos de edição com eficiência.</p>
-                         </div>
+                      <div class="max-w-4xl mx-auto space-y-8">
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h2 class="text-2xl font-bold text-white mb-4">Bem-vindo ao Shibuya Hub!</h2>
+                              <p>Este tutorial irá guiá-lo através de todas as funcionalidades disponíveis para que você possa gerenciar seus projetos de edição com eficiência.</p>
+                          </div>
 
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h3 class="text-xl font-bold text-blue-400 mb-3">Dashboard (Visão Geral)</h3>
-                             <p class="mb-2">Esta é a sua tela inicial. Aqui você vê todos os seus projetos em formato de "cards".</p>
-                             <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                 <li><strong>Cards de Projeto:</strong> Cada card mostra o nome do projeto, cliente, valor e o prazo de entrega. A cor da borda indica o status do prazo (verde para tranquilo, amarelo para próximo, vermelho para atrasado).</li>
-                                 <li><strong>Status das Etapas:</strong> Você pode alterar o status de cada etapa (Storyboard, Recortes, Câmera, CC) diretamente no card.</li>
-                                 <li><strong>Progresso:</strong> Arraste a barra de progresso para atualizar o quão completo está o projeto.</li>
-                                 <li><strong>Ações Rápidas:</strong> Use os botões para concluir o projeto, salvá-lo como um template para uso futuro, compartilhar com o cliente ou deletar o projeto.</li>
-                                 <li><strong>Ficheiros e Comentários:</strong> Anexe arquivos importantes e veja os comentários recentes diretamente no card.</li>
-                             </ul>
-                         </div>
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h3 class="text-xl font-bold text-blue-400 mb-3">Dashboard (Visão Geral)</h3>
+                              <p class="mb-2">Esta é a sua tela inicial. Aqui você vê todos os seus projetos em formato de "cards".</p>
+                              <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                  <li><strong>Cards de Projeto:</strong> Cada card mostra o nome do projeto, cliente, valor e o prazo de entrega. A cor da borda indica o status do prazo (verde para tranquilo, amarelo para próximo, vermelho para atrasado).</li>
+                                  <li><strong>Status das Etapas:</strong> Você pode alterar o status de cada etapa (Storyboard, Recortes, Câmera, CC) diretamente no card.</li>
+                                  <li><strong>Progresso:</strong> Arraste a barra de progresso para atualizar o quão completo está o projeto.</li>
+                                  <li><strong>Ações Rápidas:</strong> Use os botões para concluir o projeto, salvá-lo como um template para uso futuro, compartilhar com o cliente ou deletar o projeto.</li>
+                                  <li><strong>Ficheiros e Comentários:</strong> Anexe arquivos importantes e veja os comentários recentes diretamente no card.</li>
+                              </ul>
+                          </div>
 
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Projetos</h3>
-                             <p class="mb-2">É aqui que a mágica começa. Adicione novos projetos preenchendo o formulário.</p>
-                              <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                 <li><strong>Formulário:</strong> Insira os detalhes básicos como nome, cliente, prazo e valor.</li>
-                                 <li><strong>Templates:</strong> Se você já salvou um projeto como template, pode selecioná-lo no menu "Usar Template" para preencher automaticamente as informações de status e valor.</li>
-                                 <li><strong>Status Iniciais:</strong> Defina o estado inicial para cada etapa do novo projeto.</li>
-                              </ul>
-                         </div>
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Projetos</h3>
+                              <p class="mb-2">É aqui que a mágica começa. Adicione novos projetos preenchendo o formulário.</p>
+                               <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                   <li><strong>Formulário:</strong> Insira os detalhes básicos como nome, cliente, prazo e valor.</li>
+                                   <li><strong>Templates:</strong> Se você já salvou um projeto como template, pode selecioná-lo no menu "Usar Template" para preencher automaticamente as informações de status e valor.</li>
+                                   <li><strong>Status Iniciais:</strong> Defina o estado inicial para cada etapa do novo projeto.</li>
+                               </ul>
+                          </div>
 
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Portfólios</h3>
-                             <p class="mb-2">Esta área é para se conectar com a comunidade.</p>
-                              <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                 <li><strong>Meu Portfólio:</strong> Preencha suas informações para que outros editores e potenciais clientes possam encontrar você. Adicione seu nome, link para o portfólio, especialidades e informações de preço.</li>
-                                 <li><strong>Encontrar Editores:</strong> Procure por outros editores usando a barra de busca ou os filtros de especialidade. É uma ótima maneira de encontrar parceiros para projetos ou se inspirar.</li>
-                              </ul>
-                         </div>
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Portfólios</h3>
+                              <p class="mb-2">Esta área é para se conectar com a comunidade.</p>
+                               <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                   <li><strong>Meu Portfólio:</strong> Preencha suas informações para que outros editores e potenciais clientes possam encontrar você. Adicione seu nome, link para o portfólio, especialidades e informações de preço.</li>
+                                   <li><strong>Encontrar Editores:</strong> Procure por outros editores usando a barra de busca ou os filtros de especialidade. É uma ótima maneira de encontrar parceiros para projetos ou se inspirar.</li>
+                               </ul>
+                          </div>
 
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Financeiro</h3>
-                             <p class="mb-2">Tenha uma visão clara dos seus ganhos.</p>
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Financeiro</h3>
+                              <p class="mb-2">Tenha uma visão clara dos seus ganhos.</p>
+                               <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                   <li><strong>Painéis de Ganhos:</strong> Veja o total ganho com projetos já concluídos e o valor potencial dos projetos que ainda estão em andamento.</li>
+                                   <li><strong>Gráfico de Ganhos Mensais:</strong> O gráfico de barras mostra seus ganhos mensais com base na data de entrega dos projetos concluídos, ajudando você a visualizar sua performance ao longo do tempo.</li>
+                               </ul>
+                          </div>
+                           
+                           <!-- NEW: Resources Tab -->
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Comunidade</h3>
+                              <p class="mb-2">Uma área para a comunidade de editores. Encontre tutoriais, dicas e compartilhe seus próprios conhecimentos.</p>
                               <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                 <li><strong>Painéis de Ganhos:</strong> Veja o total ganho com projetos já concluídos e o valor potencial dos projetos que ainda estão em andamento.</li>
-                                 <li><strong>Gráfico de Ganhos Mensais:</strong> O gráfico de barras mostra seus ganhos mensais com base na data de entrega dos projetos concluídos, ajudando você a visualizar sua performance ao longo do tempo.</li>
-                              </ul>
-                         </div>
+                                   <li><strong>Tutoriais Recomendados:</strong> Descubra tutoriais e recursos valiosos para aprimorar suas habilidades de edição, especialmente para MMVs e edits de rap geek.</li>
+                                   <li><strong>Compartilhar Conhecimento:</strong> Use o formulário abaixo para enviar um link de um tutorial ou recurso que você achou útil. A comunidade agradece!</li>
+                               </ul>
+                          </div>
+                           
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Calculadora</h3>
+                              <p class="mb-2">Ferramentas úteis para o dia a dia.</p>
+                               <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                   <li><strong>Calculadora de Preço por Tempo:</strong> Não sabe quanto cobrar por um vídeo de 2 minutos e 30 segundos? Insira seu preço por minuto e a duração do vídeo para obter o valor total instantaneamente.</li>
+                                   <li><strong>Calculadora de Desconto por Atraso:</strong> Se você tem uma política de descontos por atraso na entrega, esta calculadora ajuda a determinar o valor final, aplicando uma porcentagem de desconto por cada dia de atraso.</li>
+                               </ul>
+                          </div>
+                           
+                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                              <h3 class="text-xl font-bold text-blue-400 mb-3">Portal do Cliente</h3>
+                              <p class="mb-2">Compartilhe o progresso com seus clientes de forma profissional.</p>
+                               <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                   <li><strong>Como compartilhar:</strong> No card do projeto, clique no ícone de compartilhamento (três pontos conectados). Isso copiará um link único para a sua área de transferência.</li>
+                                   <li><strong>O que o cliente vê:</strong> Ao acessar o link, seu cliente verá uma página dedicada ao projeto dele, com o progresso geral, status de cada etapa, arquivos para download e uma caixa de comentários para feedback. Tudo isso sem precisar de login!</li>
+                               </ul>
+                          </div>
+                      </div>
+                 </div>
+                 <!-- NEW: Resources tab content -->
+                 <div id="community" class="tab-content max-w-4xl mx-auto space-y-6">
+                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                        <h2 class="text-2xl font-bold mb-4 text-white">Comunidade</h2>
+                        <p class="text-gray-400">Encontre e compartilhe recursos valiosos para aprimorar suas habilidades de edição.</p>
+                        
+                        <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                            <input type="search" id="search-community-input" placeholder="Buscar por título ou tag..." class="w-full sm:w-1/2 p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div id="community-tags-filter" class="flex flex-wrap items-center gap-2">
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="MMV">#MMV</button>
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="After Effects">#After Effects</button>
+                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="Edits">#Edits</button>
+                            </div>
+                        </div>
+                    </div>
 
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Calculadora</h3>
-                             <p class="mb-2">Ferramentas úteis para o dia a dia.</p>
-                              <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                 <li><strong>Calculadora de Preço por Tempo:</strong> Não sabe quanto cobrar por um vídeo de 2 minutos e 30 segundos? Insira seu preço por minuto e a duração do vídeo para obter o valor total instantaneamente.</li>
-                                 <li><strong>Calculadora de Desconto por Atraso:</strong> Se você tem uma política de descontos por atraso na entrega, esta calculadora ajuda a determinar o valor final, aplicando uma porcentagem de desconto por cada dia de atraso.</li>
-                              </ul>
-                         </div>
-                         
-                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                             <h3 class="text-xl font-bold text-blue-400 mb-3">Portal do Cliente</h3>
-                             <p class="mb-2">Compartilhe o progresso com seus clientes de forma profissional.</p>
-                              <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                 <li><strong>Como compartilhar:</strong> No card do projeto, clique no ícone de compartilhamento (três pontos conectados). Isso copiará um link único para a sua área de transferência.</li>
-                                 <li><strong>O que o cliente vê:</strong> Ao acessar o link, seu cliente verá uma página dedicada ao projeto dele, com o progresso geral, status de cada etapa, arquivos para download e uma caixa de comentários para feedback. Tudo isso sem precisar de login!</li>
-                              </ul>
-                         </div>
-                     </div>
+                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4">Novo Post</h3>
+                        <form id="share-resource-form" class="space-y-4">
+                            <input type="text" id="resource-title" placeholder="Título do Post" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                            <input type="url" id="resource-link" placeholder="Link (YouTube, Google Drive, etc.)" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                            <input type="text" id="resource-tags" placeholder="Tags (Ex: 'MMV', 'Transição', 'After Effects')" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Fazer Post</button>
+                        </form>
+                    </div>
+
+                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4">Posts da Comunidade</h3>
+                        <div id="community-resources-container" class="space-y-4">
+                            <!-- Resources will be rendered here from Firestore -->
+                        </div>
+                    </div>
                  </div>
             </div>
             <footer class="text-center py-6 text-sm text-gray-500">
@@ -418,22 +543,38 @@
         </main>
     </div>
 
+    <!-- Edit Project Modal (NEW) -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-40" style="display: none;">
+        <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl p-8 w-full max-w-lg">
+            <h2 class="text-2xl font-bold mb-6 text-white">Editar Projeto</h2>
+            <form id="edit-project-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="edit-project-name" placeholder="Nome do Projeto" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <input type="text" id="edit-client-name" placeholder="Nome do Cliente" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="date" id="edit-deadline" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <input type="number" id="edit-project-value" placeholder="Valor (R$)" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="flex gap-4 pt-4 mt-4">
+                    <button type="button" id="cancel-edit-btn" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">Cancelar</button>
+                    <button type="submit" id="save-edit-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- Client Portal Container -->
     <div id="client-portal-container" class="min-h-screen p-4 md:p-8">
         <!-- Client portal content will be injected here -->
     </div>
-
-    <!-- Vanilla Calendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/vanilla-js-calendar@2.6.0/build/vanilla-js-calendar.min.js"></script>
-
+    
     <!-- Firebase SDK -->
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDoc, setLogLevel, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDoc, setLogLevel, arrayUnion, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
-
+        
         // --- Your web app's Firebase configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBe14b2ITHUch8-LytK5ZrtCgfvxUFrq8s",
@@ -455,18 +596,24 @@
         let projects = [];
         let projectTemplates = [];
         let allPublicPortfolios = [];
+        let allCommunityResources = [];
         let activePortfolioFilters = new Set();
+        let activeCommunityFilters = new Set();
         let currentUserId = null;
+        let userProfile = {};
         let unsubscribeFromProjects = null;
         let unsubscribeFromTemplates = null;
         let unsubscribeFromPortfolios = null;
+        let unsubscribeFromProfile = null;
         let noteUpdateTimeout = null;
         let monthlyIncomeChart = null;
-        let timeUpdateInterval = null; // <-- For auto-updating time-based UI
+        let timeUpdateInterval = null;
         let activeProjectFilter = 'all';
         let projectSearchTerm = '';
+        let communitySearchTerm = '';
         let calendar = null;
-
+        let isEditing = false;
+        let currentEditProjectId = null;
 
         // --- DOM ELEMENTS ---
         const notification = document.getElementById('notification');
@@ -517,7 +664,15 @@
         const completedProjectsContainer = document.getElementById('completed-projects-container');
         const completedProjectsSection = document.getElementById('completed-projects-section');
         const calendarContainer = document.getElementById('calendar-container');
-        
+        const profileForm = document.getElementById('profile-form');
+        const editModal = document.getElementById('edit-modal');
+        const editProjectForm = document.getElementById('edit-project-form');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const shareResourceForm = document.getElementById('share-resource-form');
+        const communityResourcesContainer = document.getElementById('community-resources-container');
+        const searchCommunityInput = document.getElementById('search-community-input');
+        const communityTagsFilter = document.getElementById('community-tags-filter');
+
         // --- PAGE LOAD ROUTING ---
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
@@ -576,7 +731,7 @@
 
         let confirmCallback = null;
         const showConfirmationModal = (message, onConfirm) => {
-            modalMessage.textContent = message;
+            modalMessage.innerHTML = message;
             confirmCallback = onConfirm;
             confirmationModal.style.display = 'flex';
             setTimeout(() => {
@@ -601,7 +756,6 @@
 
         // --- AUTHENTICATION ---
         onAuthStateChanged(auth, async (user) => {
-            // This logic only runs in normal app mode
             const params = new URLSearchParams(window.location.search);
             if (params.get('mode') === 'client') return;
 
@@ -611,32 +765,36 @@
                 userEmailSpan.textContent = user.email;
                 authContainer.style.display = 'none';
                 appContainer.style.display = 'flex';
+
+                listenToUserProfile(user);
                 listenToProjects();
                 listenToTemplates();
                 listenToPortfolios();
+                listenToResources();
                 loadMyPortfolio();
                 
-                // Start interval to update time-based UI elements
                 if (timeUpdateInterval) clearInterval(timeUpdateInterval);
                 timeUpdateInterval = setInterval(() => {
                     renderDashboardCards();
                     renderProjectLists();
                     generateAndRenderNotifications();
-                }, 60000); // Update every 60 seconds
+                }, 60000);
 
             } else {
                 currentUserId = null;
                 authContainer.style.display = 'flex';
                 appContainer.style.display = 'none';
 
-                // Clear interval on logout
                 if (timeUpdateInterval) clearInterval(timeUpdateInterval);
 
                 if (unsubscribeFromProjects) unsubscribeFromProjects();
                 if (unsubscribeFromTemplates) unsubscribeFromTemplates();
                 if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
+                if (unsubscribeFromResources) unsubscribeFromResources();
+                if (unsubscribeFromProfile) unsubscribeFromProfile();
                 projects = [];
                 projectTemplates = [];
+                allCommunityResources = [];
                 renderDashboardCards();
                 renderProjectLists();
                 portfoliosContainer.innerHTML = '';
@@ -682,21 +840,116 @@
             document.getElementById('signup-section').style.display = 'none';
         });
         
+        // --- PROFILE SYSTEM ---
+        const listenToUserProfile = (user) => {
+            if (unsubscribeFromProfile) unsubscribeFromProfile();
+            const userDocRef = doc(db, 'users', user.uid);
+            unsubscribeFromProfile = onSnapshot(userDocRef, async (docSnap) => {
+                if (!docSnap.exists()) {
+                    const defaultProfile = {
+                        email: user.email, bio: '', photoURL: '',
+                        deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
+                    };
+                    await setDoc(userDocRef, defaultProfile);
+                    userProfile = defaultProfile;
+                } else {
+                    userProfile = docSnap.data();
+                }
+                renderProfileUI();
+                applyCustomColors();
+            });
+        };
+
+        const renderProfileUI = () => {
+            if (!userProfile) return;
+            document.getElementById('profile-bio').value = userProfile.bio || '';
+            document.getElementById('profile-pic-preview').src = userProfile.photoURL || 'https://placehold.co/100x100/161b22/c9d1d9?text=Foto';
+            if (userProfile.deadlineColors) {
+                document.getElementById('color-ok').value = userProfile.deadlineColors.ok;
+                document.getElementById('color-warning').value = userProfile.deadlineColors.warning;
+                document.getElementById('color-danger').value = user.deadlineColors.danger;
+            }
+        };
+
+        const applyCustomColors = () => {
+            if (!userProfile.deadlineColors) return;
+            let customStyle = document.getElementById('custom-colors-style');
+            if (!customStyle) {
+                customStyle = document.createElement('style');
+                customStyle.id = 'custom-colors-style';
+                document.head.appendChild(customStyle);
+            }
+            customStyle.innerHTML = `
+                .border-green-500 { border-color: ${userProfile.deadlineColors.ok} !important; }
+                .border-yellow-400, .border-yellow-500 { border-color: ${userProfile.deadlineColors.warning} !important; }
+                .border-red-500 { border-color: ${userProfile.deadlineColors.danger} !important; }
+            `;
+        };
+
+        document.getElementById('profile-pic-upload').addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('profile-pic-preview').src = event.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUserId) return;
+            showNotification("Salvando perfil...");
+
+            const newBio = document.getElementById('profile-bio').value;
+            const newColors = {
+                ok: document.getElementById('color-ok').value,
+                warning: document.getElementById('color-warning').value,
+                danger: document.getElementById('color-danger').value,
+            };
+            
+            const file = document.getElementById('profile-pic-upload').files[0];
+            
+            try {
+             // CORREÇÃO: Comece com a URL existente para não perdê-la.
+                const updatedProfileData = {
+                    bio: newBio,
+                    deadlineColors: newColors,
+                    photoURL: userProfile.photoURL || '' // Inicia com a URL da foto atual.
+                };
+
+                if (file) {
+                   const storageRef = ref(storage, `users/${currentUserId}/profile.jpg`);
+                   await uploadBytes(storageRef, file);
+             // Se um novo arquivo foi enviado, atualiza a URL.
+                   updatedProfileData.photoURL = await getDownloadURL(storageRef);
+                }
+
+                await updateDoc(doc(db, 'users', currentUserId), updatedProfileData);
+                showNotification("Perfil salvo com sucesso!");
+            } catch (error) {
+                console.error("Erro ao salvar perfil:", error);
+                showNotification("Erro ao salvar o perfil.", true);
+            }
+        });
+
+
         // --- FIRESTORE & APP LOGIC ---
         const getProjectsCollectionPath = () => currentUserId ? `users/${currentUserId}/projects` : null;
         const getTemplatesCollectionPath = () => currentUserId ? `users/${currentUserId}/templates` : null;
+        const getResourcesCollectionPath = () => 'resources';
 
         const listenToProjects = () => {
             if (unsubscribeFromProjects) unsubscribeFromProjects();
             const path = getProjectsCollectionPath();
             if (!path) return;
             unsubscribeFromProjects = onSnapshot(collection(db, path), (snapshot) => {
-                projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), order: doc.data().order || 0 }));
                 renderDashboardCards();
                 renderProjectLists();
                 renderFinancialDashboard();
                 generateAndRenderNotifications();
-                renderCalendar();
+                // Removed renderCalendar() to avoid errors if the element isn't in view
             }, (error) => {
                 console.error("Erro ao buscar projetos: ", error);
                 showNotification("Erro ao carregar projetos.", true);
@@ -721,6 +974,15 @@
             }, (error) => {
                 console.error("Erro ao buscar portfólios: ", error);
                 showNotification("Erro ao carregar portfólios.", true);
+            });
+        };
+
+        let unsubscribeFromResources = null;
+        const listenToResources = () => {
+            if(unsubscribeFromResources) unsubscribeFromResources();
+            unsubscribeFromResources = onSnapshot(collection(db, getResourcesCollectionPath()), (snapshot) => {
+                allCommunityResources = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                applyCommunityFiltersAndRender();
             });
         };
         
@@ -748,6 +1010,9 @@
                 }
             });
             document.getElementById(tabId).classList.add('active');
+            if (tabId === 'agenda') {
+                renderCalendar();
+            }
         };
         
         const calculateDaysLeft = (deadline) => {
@@ -802,26 +1067,34 @@
             `;
         };
         
-        const renderCards = (container, projectList) => {
+        const renderCards = (container, projectList, sortable = false) => {
             container.innerHTML = '';
             if (projectList.length === 0) {
                 container.innerHTML = `<p class="text-center md:col-span-2 xl:col-span-3 2xl:col-span-4 text-gray-500">Nenhum projeto encontrado.</p>`;
                 return;
             }
-
-            const sortedProjects = [...projectList].sort((a, b) => calculateDaysLeft(a.deadline).days - calculateDaysLeft(b.deadline).days);
-
+        
+            const sortedProjects = [...projectList].sort((a, b) => {
+                if (a.order !== undefined && b.order !== undefined) {
+                    return a.order - b.order;
+                }
+                // Fallback to sorting by deadline if 'order' is not available
+                const aDays = calculateDaysLeft(a.deadline).days;
+                const bDays = calculateDaysLeft(b.deadline).days;
+                return aDays - bDays;
+            });
+        
             sortedProjects.forEach(project => {
                 const deadlineInfo = calculateDaysLeft(project.deadline);
                 const isCompleted = project.progress == 100;
-
+        
                 let finalBorderClass = deadlineInfo.colorClass;
                 let finalText = deadlineInfo.text;
                 if (isCompleted) {
                     finalBorderClass = 'border-blue-500';
                     finalText = 'Concluído';
                 }
-
+        
                 const filesHTML = (project.files || []).map(file => `
                     <li class="text-xs truncate">
                         <a href="${file.url}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1.5">
@@ -837,14 +1110,21 @@
                     </div>
                 `).join('') || '<li class="text-xs text-gray-500">Nenhum comentário.</li>';
 
-
                 const card = document.createElement('div');
-                card.className = `bg-[#161b22] border border-[#30363d] p-5 rounded-xl shadow-lg flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1 border-l-4 ${finalBorderClass}`;
+                card.id = `project-card-${project.id}`;
+                card.draggable = sortable;
+                card.dataset.id = project.id;
+                card.dataset.order = project.order;
+                card.classList.add('bg-[#161b22]', 'border', 'border-[#30363d]', 'p-5', 'rounded-xl', 'shadow-lg', 'flex', 'flex-col', 'justify-between', 'transition-transform', 'duration-200', 'hover:-translate-y-1', 'border-l-4', finalBorderClass, 'cursor-grab', 'active:cursor-grabbing');
+                
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-xl font-bold text-white">${project.name}</h3>
                             <div class="flex items-center gap-2">
+                                <button class="edit-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Editar Projeto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                </button>
                                 <button class="share-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Partilhar com Cliente">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                                 </button>
@@ -868,12 +1148,12 @@
                         </div>
 
                         <div class="border-t border-[#30363d] pt-3 mt-4">
-                           <label class="text-sm">Ficheiros</label>
-                           <ul class="mt-1 space-y-1.5">${filesHTML}</ul>
-                           <label class="block w-full text-center mt-2 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md cursor-pointer transition-colors">
-                               Anexar Ficheiro
-                               <input type="file" class="hidden file-upload-input" data-id="${project.id}">
-                           </label>
+                            <label class="text-sm">Ficheiros</label>
+                            <ul class="mt-1 space-y-1.5">${filesHTML}</ul>
+                            <label class="block w-full text-center mt-2 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md cursor-pointer transition-colors">
+                                Anexar Ficheiro
+                                <input type="file" class="hidden file-upload-input" data-id="${project.id}">
+                            </label>
                         </div>
                     </div>
                     <div class="mt-6">
@@ -887,11 +1167,14 @@
                 `;
                 container.appendChild(card);
             });
+            if (sortable) {
+                makeSortable(container);
+            }
         };
 
         const renderDashboardCards = () => {
             const inProgressProjects = projects.filter(p => p.progress < 100);
-            renderCards(projectCardsContainer, inProgressProjects);
+            renderCards(projectCardsContainer, inProgressProjects, true);
         };
 
         const renderProjectLists = () => {
@@ -927,6 +1210,74 @@
             completedProjectsSection.style.display = completed.length > 0 ? 'block' : 'none';
         };
 
+        const makeSortable = (container) => {
+            let dragSrcEl = null;
+
+            function handleDragStart(e) {
+                this.style.opacity = '0.4';
+                dragSrcEl = this;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', this.innerHTML);
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            }
+
+            function handleDragEnter(e) {
+                this.classList.add('bg-[#30363d]');
+            }
+
+            function handleDragLeave(e) {
+                this.classList.remove('bg-[#30363d]');
+            }
+
+            async function handleDrop(e) {
+                e.stopPropagation();
+                if (dragSrcEl !== this) {
+                    const fromId = dragSrcEl.dataset.id;
+                    const toId = this.dataset.id;
+                    const fromOrder = parseInt(dragSrcEl.dataset.order);
+                    const toOrder = parseInt(this.dataset.order);
+
+                    const reorderedProjects = projects.filter(p => p.progress < 100).sort((a,b) => a.order - b.order);
+                    
+                    const fromIndex = reorderedProjects.findIndex(p => p.id === fromId);
+                    const [draggedItem] = reorderedProjects.splice(fromIndex, 1);
+                    const toIndex = reorderedProjects.findIndex(p => p.id === toId);
+                    reorderedProjects.splice(toIndex, 0, draggedItem);
+
+                    // Re-assign order numbers
+                    const batch = writeBatch(db);
+                    const path = getProjectsCollectionPath();
+                    reorderedProjects.forEach((project, index) => {
+                        const projectRef = doc(db, path, project.id);
+                        batch.update(projectRef, { order: index });
+                    });
+                    await batch.commit();
+                }
+                return false;
+            }
+
+            function handleDragEnd(e) {
+                this.style.opacity = '1';
+                container.querySelectorAll('div').forEach((item) => {
+                    item.classList.remove('bg-[#30363d]');
+                });
+            }
+
+            container.querySelectorAll('div').forEach((item) => {
+                item.addEventListener('dragstart', handleDragStart, false);
+                item.addEventListener('dragenter', handleDragEnter, false);
+                item.addEventListener('dragover', handleDragOver, false);
+                item.addEventListener('dragleave', handleDragLeave, false);
+                item.addEventListener('drop', handleDrop, false);
+                item.addEventListener('dragend', handleDragEnd, false);
+            });
+        };
+
         const renderCalendar = () => {
             if (!calendarContainer) return;
             const markedDates = projects.map(p => {
@@ -943,17 +1294,17 @@
                 isDark: true,
                 markedDates,
                  popups: projects.reduce((acc, p) => {
-                    if (p.deadline) {
-                        if (!acc[p.deadline]) {
-                            acc[p.deadline] = [];
-                        }
-                        acc[p.deadline].push({
-                            modifier: 'bg-blue-600',
-                            html: p.name,
-                        });
-                    }
-                    return acc;
-                }, {}),
+                     if (p.deadline) {
+                         if (!acc[p.deadline]) {
+                             acc[p.deadline] = [];
+                         }
+                         acc[p.deadline].push({
+                             modifier: 'bg-blue-600',
+                             html: p.name,
+                         });
+                     }
+                     return acc;
+                 }, {}),
 
             };
             if (!calendar) {
@@ -1043,6 +1394,51 @@
             });
         };
 
+        const applyCommunityFiltersAndRender = () => {
+            const searchTerm = searchCommunityInput.value.toLowerCase().trim();
+            let filteredResources = [...allCommunityResources];
+
+            if (activeCommunityFilters.size > 0) {
+                filteredResources = filteredResources.filter(r => {
+                    const tags = (r.tags || '').toLowerCase();
+                    for (const filter of activeCommunityFilters) {
+                        if (tags.includes(filter)) return true;
+                    }
+                    return false;
+                });
+            }
+
+            if (searchTerm) {
+                filteredResources = filteredResources.filter(r =>
+                    (r.title || '').toLowerCase().includes(searchTerm) ||
+                    (r.tags || '').toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderResources(filteredResources);
+        };
+        
+        const renderResources = (resources) => {
+            communityResourcesContainer.innerHTML = '';
+            if (resources.length === 0) {
+                 communityResourcesContainer.innerHTML = `<p class="text-center text-gray-500">Nenhum post ainda. Seja o primeiro a postar!</p>`;
+                 return;
+            }
+            // Sort resources by timestamp, newest first
+            const sortedResources = resources.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
+
+            sortedResources.forEach(resource => {
+                const tagsHTML = (resource.tags || '').split(',').map(tag => `<span class="text-sm text-gray-500">#${tag.trim()}</span>`).join(' ');
+                const card = document.createElement('div');
+                card.className = 'bg-[#0d1117] p-4 rounded-lg border border-[#30363d]';
+                card.innerHTML = `
+                    <a href="${resource.link}" target="_blank" class="text-blue-400 hover:underline font-bold text-lg">${resource.title}</a>
+                    <p class="text-sm text-gray-400 mt-1">${tagsHTML}</p>
+                `;
+                communityResourcesContainer.appendChild(card);
+            });
+        };
+
         const applyFiltersAndRenderPortfolios = () => {
             const searchTerm = searchPortfolioInput.value.toLowerCase().trim();
             let filteredPortfolios = [...allPublicPortfolios];
@@ -1086,52 +1482,120 @@
             });
         };
         
-        const handleAddProject = async (e) => {
+        const handleAddOrEditProject = async (e) => {
             e.preventDefault();
-            
-            const proceedWithAddingProject = async () => {
-                const path = getProjectsCollectionPath();
-                if(!path) return showNotification("Erro: Utilizador não autenticado.", true);
+            const path = getProjectsCollectionPath();
+            if (!path) {
+                showNotification("Erro: Utilizador não autenticado.", true);
+                return;
+            }
 
-                const newProject = {
-                    name: document.getElementById('project-name').value,
-                    client: document.getElementById('client-name').value,
-                    deadline: document.getElementById('deadline').value,
-                    value: document.getElementById('project-value').value,
-                    progress: 0,
-                    storyboardStatus: document.getElementById('storyboard-status').value,
-                    recortesStatus: document.getElementById('recortes-status').value,
-                    cameraStatus: document.getElementById('camera-status').value,
-                    ccStatus: document.getElementById('cc-status').value,
-                    notes: "",
-                    files: [],
-                    comments: [],
-                    public: false
-                };
-                try {
-                    await addDoc(collection(db, path), newProject);
-                    addProjectForm.reset();
-                    templateSelect.value = "";
-                    switchTab('dashboard');
-                    showNotification("Projeto adicionado com sucesso!");
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    showNotification("Erro ao adicionar projeto.", true);
-                }
+            const isAddForm = e.target.id === 'add-project-form';
+
+            const projectName = isAddForm ? document.getElementById('project-name').value : document.getElementById('edit-project-name').value;
+            const projectValue = parseFloat(isAddForm ? document.getElementById('project-value').value : document.getElementById('edit-project-value').value) || 0;
+            const clientName = isAddForm ? document.getElementById('client-name').value : document.getElementById('edit-client-name').value;
+            const deadline = isAddForm ? document.getElementById('deadline').value : document.getElementById('edit-deadline').value;
+            
+            const newProjectData = {
+                name: projectName,
+                client: clientName,
+                deadline: deadline,
+                value: projectValue,
             };
-            
-            const projectName = document.getElementById('project-name').value;
-            const projectValue = parseFloat(document.getElementById('project-value').value) || 0;
 
-            if (projectValue <= 1) {
-                showConfirmationModal(
-                    `Tem certeza que deseja adicionar o projeto "${projectName}" com o valor de R$ ${projectValue.toFixed(2)}?`,
-                    proceedWithAddingProject
-                );
+            if (isAddForm) {
+                // Add new project
+                if (projectValue <= 1) {
+                    showConfirmationModal(
+                        `Tem certeza que deseja adicionar o projeto "${projectName}" com o valor de R$ ${projectValue.toFixed(2)}?`,
+                        async () => {
+                            try {
+                                const fullNewProject = {
+                                    ...newProjectData,
+                                    progress: 0,
+                                    storyboardStatus: document.getElementById('storyboard-status').value,
+                                    recortesStatus: document.getElementById('recortes-status').value,
+                                    cameraStatus: document.getElementById('camera-status').value,
+                                    ccStatus: document.getElementById('cc-status').value,
+                                    notes: "",
+                                    files: [],
+                                    comments: [],
+                                    public: false,
+                                    order: projects.length // NEW: set initial order
+                                };
+                                await addDoc(collection(db, path), fullNewProject);
+                                addProjectForm.reset();
+                                templateSelect.value = "";
+                                switchTab('dashboard');
+                                showNotification("Projeto adicionado com sucesso!");
+                            } catch (error) {
+                                console.error("Error adding document: ", error);
+                                showNotification("Erro ao adicionar projeto.", true);
+                            }
+                        }
+                    );
+                } else {
+                     try {
+                        const fullNewProject = {
+                            ...newProjectData,
+                            progress: 0,
+                            storyboardStatus: document.getElementById('storyboard-status').value,
+                            recortesStatus: document.getElementById('recortes-status').value,
+                            cameraStatus: document.getElementById('camera-status').value,
+                            ccStatus: document.getElementById('cc-status').value,
+                            notes: "",
+                            files: [],
+                            comments: [],
+                            public: false,
+                            order: projects.length // NEW: set initial order
+                        };
+                        await addDoc(collection(db, path), fullNewProject);
+                        addProjectForm.reset();
+                        templateSelect.value = "";
+                        switchTab('dashboard');
+                        showNotification("Projeto adicionado com sucesso!");
+                    } catch (error) {
+                        console.error("Error adding document: ", error);
+                        showNotification("Erro ao adicionar projeto.", true);
+                    }
+                }
             } else {
-                proceedWithAddingProject();
+                // Edit existing project
+                try {
+                    await updateDoc(doc(db, path, currentEditProjectId), newProjectData);
+                    editModal.style.display = 'none';
+                    showNotification("Projeto atualizado com sucesso!");
+                    isEditing = false;
+                    currentEditProjectId = null;
+                } catch (error) {
+                    console.error("Error updating document: ", error);
+                    showNotification("Erro ao atualizar projeto.", true);
+                }
             }
         };
+
+        addProjectForm.addEventListener('submit', handleAddOrEditProject);
+        editProjectForm.addEventListener('submit', handleAddOrEditProject);
+
+        // NEW: Open the edit modal
+        const openEditModal = (project) => {
+            isEditing = true;
+            currentEditProjectId = project.id;
+            document.getElementById('edit-project-name').value = project.name;
+            document.getElementById('edit-client-name').value = project.client;
+            document.getElementById('edit-deadline').value = project.deadline;
+            document.getElementById('edit-project-value').value = project.value;
+            editModal.style.display = 'flex';
+        };
+
+        // NEW: Close the edit modal
+        cancelEditBtn.addEventListener('click', () => {
+            editModal.style.display = 'none';
+            isEditing = false;
+            currentEditProjectId = null;
+            editProjectForm.reset();
+        });
 
         const handleSavePortfolio = async (e) => {
             e.preventDefault();
@@ -1180,25 +1644,34 @@
             if (!path) return;
 
             const projectDocRef = doc(db, path, projectId);
+            const project = projects.find(p => p.id === projectId);
+
+            // NEW: Handle Edit button click
+            if (button && button.classList.contains('edit-project-btn')) {
+                if (project) {
+                    openEditModal(project);
+                }
+                return;
+            }
 
              if (button && button.classList.contains('share-project-btn')) {
-                try {
-                    await updateDoc(projectDocRef, { public: true });
-                    const url = `${window.location.origin}${window.location.pathname}?mode=client&userId=${currentUserId}&projectId=${projectId}`;
-                    
-                    const dummy = document.createElement('textarea');
-                    document.body.appendChild(dummy);
-                    dummy.value = url;
-                    dummy.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(dummy);
+                 try {
+                     await updateDoc(projectDocRef, { public: true });
+                     const url = `${window.location.origin}${window.location.pathname}?mode=client&userId=${currentUserId}&projectId=${projectId}`;
+                     
+                     const dummy = document.createElement('textarea');
+                     document.body.appendChild(dummy);
+                     dummy.value = url;
+                     dummy.select();
+                     document.execCommand('copy');
+                     document.body.removeChild(dummy);
 
-                    showNotification("Link do portal do cliente copiado!");
-                } catch (error) {
-                    console.error("Error sharing project:", error);
-                    showNotification("Erro ao partilhar o projeto.", true);
-                }
-            }
+                     showNotification("Link do portal do cliente copiado!");
+                 } catch (error) {
+                     console.error("Error sharing project:", error);
+                     showNotification("Erro ao partilhar o projeto.", true);
+                 }
+             }
 
 
             if (target.classList.contains('progress-slider')) {
@@ -1222,23 +1695,23 @@
             }
 
              if (button && button.classList.contains('save-template-btn')) {
-                const projectToSave = projects.find(p => p.id === projectId);
-                if (projectToSave) {
-                    const templateName = prompt("Qual o nome para este template?", projectToSave.name);
-                    if (templateName) {
-                        const templateData = { ...projectToSave };
-                        delete templateData.id; delete templateData.deadline; delete templateData.client;
-                        delete templateData.notes; delete templateData.files; delete templateData.comments;
-                        templateData.name = templateName;
-                        try {
-                            await addDoc(collection(db, getTemplatesCollectionPath()), templateData);
-                            showNotification("Template salvo com sucesso!");
-                        } catch(err) {
-                            showNotification("Erro ao salvar o template.", true);
-                        }
-                    }
-                }
-            }
+                 const projectToSave = projects.find(p => p.id === projectId);
+                 if (projectToSave) {
+                     const templateName = prompt("Qual o nome para este template?", projectToSave.name);
+                     if (templateName) {
+                         const templateData = { ...projectToSave };
+                         delete templateData.id; delete templateData.deadline; delete templateData.client;
+                         delete templateData.notes; delete templateData.files; delete templateData.comments;
+                         templateData.name = templateName;
+                         try {
+                             await addDoc(collection(db, getTemplatesCollectionPath()), templateData);
+                             showNotification("Template salvo com sucesso!");
+                         } catch(err) {
+                             showNotification("Erro ao salvar o template.", true);
+                         }
+                     }
+                 }
+             }
 
             if (button && button.classList.contains('delete-project-btn')) {
                 showConfirmationModal("Tem certeza que deseja remover este projeto?", async () => {
@@ -1299,6 +1772,15 @@
             applyFiltersAndRenderPortfolios();
         };
         
+        const handleCommunityTagClick = (e) => {
+            if (e.target.tagName !== 'BUTTON') return;
+            const tag = e.target.dataset.tag.toLowerCase();
+            e.target.classList.toggle('bg-blue-600');
+            e.target.classList.toggle('text-white');
+            activeCommunityFilters.has(tag) ? activeCommunityFilters.delete(tag) : activeCommunityFilters.add(tag);
+            applyCommunityFiltersAndRender();
+        };
+
         const handleCalculatePrice = () => {
             const pricePerMinute = parseFloat(document.getElementById('calc-price-per-minute').value) || 0;
             const minutes = parseInt(document.getElementById('calc-minutes').value) || 0;
@@ -1326,6 +1808,39 @@
             const finalValue = originalValue - discountValue;
             resultDiv.innerHTML = `<p>Desconto: <span class="font-bold">${totalDiscountPercent.toFixed(2)}% (R$ ${discountValue.toFixed(2)})</span></p><p class="text-lg mt-2">Valor final: <span class="font-bold text-2xl text-green-400">R$ ${finalValue.toFixed(2)}</span></p>`;
         };
+
+        const handleResourceSubmission = async (e) => {
+            e.preventDefault();
+            if (!currentUserId) {
+                showNotification("Você precisa estar logado para enviar posts.", true);
+                return;
+            }
+            const title = document.getElementById('resource-title').value;
+            const link = document.getElementById('resource-link').value;
+            const tags = document.getElementById('resource-tags').value;
+
+            if (!title || !link) {
+                showNotification("Título e link são obrigatórios.", true);
+                return;
+            }
+
+            const resourceData = {
+                title: title,
+                link: link,
+                tags: tags,
+                submittedBy: currentUserId,
+                timestamp: new Date()
+            };
+
+            try {
+                await addDoc(collection(db, getResourcesCollectionPath()), resourceData);
+                shareResourceForm.reset();
+                showNotification("Post enviado para a comunidade!");
+            } catch (error) {
+                console.error("Error submitting resource: ", error);
+                showNotification("Erro ao enviar post.", true);
+            }
+        };
         
         const generateAndRenderNotifications = () => {
             const notifications = [];
@@ -1350,12 +1865,17 @@
         const loadClientPortal = (userId, projectId) => {
             const projectDocRef = doc(db, `users/${userId}/projects`, projectId);
 
-            onSnapshot(projectDocRef, (doc) => {
-                if (!doc.exists()) {
-                    clientPortalContainer.innerHTML = `<h1 class="text-2xl text-red-500">Projeto não encontrado ou acesso negado.</h1>`;
+            onSnapshot(projectDocRef, async (docSnap) => {
+                if (!docSnap.exists() || docSnap.data().public === false) {
+                    clientPortalContainer.innerHTML = `
+                        <div class="max-w-4xl mx-auto text-center mt-12">
+                            <h1 class="text-4xl font-bold text-red-500">Acesso Negado</h1>
+                            <p class="text-gray-400 mt-4">Este projeto não foi encontrado ou o acesso não foi permitido pelo editor.</p>
+                        </div>
+                    `;
                     return;
                 }
-                const project = doc.data();
+                const project = docSnap.data();
 
                 const filesHTML = (project.files || []).map(file => `
                     <a href="${file.url}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-2 bg-[#161b22] p-3 rounded-lg">
@@ -1364,17 +1884,47 @@
                     </a>`).join('') || '<p class="text-gray-400">Nenhum ficheiro disponível.</p>';
                 
                 const commentsHTML = (project.comments || []).map(comment => `
-                       <div class="p-3 rounded-lg ${comment.author === 'Editor' ? 'bg-blue-900/40 ml-auto' : 'bg-gray-700/40 mr-auto'}" style="max-width: 80%;">
-                           <p class="text-sm">${comment.text}</p>
-                           <p class="text-gray-400 text-[11px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
-                       </div>
+                         <div class="p-3 rounded-lg ${comment.author === 'Editor' ? 'bg-blue-900/40 ml-auto' : 'bg-gray-700/40 mr-auto'}" style="max-width: 80%;">
+                             <p class="text-sm">${comment.text}</p>
+                             <p class="text-gray-400 text-[11px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
+                         </div>
                 `).join('');
+
+                // NEW: Logic for client approval buttons and message
+                let approvalSectionHTML = '';
+                const stages = ['storyboard', 'recortes', 'camera', 'cc'];
+                let currentStage = '';
+                
+                for(const stage of stages) {
+                    const status = project[`${stage}Status`];
+                    if (status === 'Em Andamento') {
+                        currentStage = stage;
+                        break;
+                    }
+                }
+                
+                if (currentStage) {
+                    approvalSectionHTML = `
+                        <div class="bg-[#0d1117] p-4 rounded-xl border border-[#30363d] mt-6">
+                            <p class="text-lg font-semibold mb-3">Revisar Etapa: <span class="capitalize text-blue-400">${currentStage}</span></p>
+                            <form id="client-approval-form" data-stage="${currentStage}">
+                                <textarea id="client-feedback-input" class="w-full p-2 bg-[#161b22] border border-[#30363d] rounded-lg resize-none mb-3" placeholder="Deixe um comentário opcional..." rows="2"></textarea>
+                                <div class="flex gap-2">
+                                    <button type="button" id="approve-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Aprovar</button>
+                                    <button type="button" id="reject-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg">Rejeitar</button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                }
+
 
                 clientPortalContainer.innerHTML = `
                     <div class="max-w-4xl mx-auto">
                         <header class="text-center mb-10">
                             <h1 class="text-4xl font-bold text-blue-500">Shibuya Hub</h1>
                             <p class="text-gray-400 mt-2">Portal de Acompanhamento do Cliente</p>
+                            ${project.clientPortalGreeting ? `<p class="text-lg mt-4 font-semibold">${project.clientPortalGreeting}</p>` : ''}
                         </header>
                         <div class="bg-[#161b22] border border-[#30363d] rounded-xl p-6 md:p-8">
                             <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">${project.name}</h2>
@@ -1394,6 +1944,8 @@
                                 <div class="flex items-center gap-3 p-3 bg-[#0d1117] rounded-lg">${getStatusIcon(project.cameraStatus)} Câmera: <span class="font-semibold ml-auto">${project.cameraStatus}</span></div>
                                 <div class="flex items-center gap-3 p-3 bg-[#0d1117] rounded-lg">${getStatusIcon(project.ccStatus)} Color Correction: <span class="font-semibold ml-auto">${project.ccStatus}</span></div>
                             </div>
+                            
+                            ${approvalSectionHTML}
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
@@ -1419,7 +1971,6 @@
                 const commentsBox = document.getElementById('comments-box');
                 if (commentsBox) commentsBox.scrollTop = commentsBox.scrollHeight;
 
-
                 document.getElementById('comment-form')?.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const input = document.getElementById('comment-input');
@@ -1439,7 +1990,42 @@
                         }
                     }
                 });
+                
+                document.getElementById('approve-btn')?.addEventListener('click', async () => {
+                    const stage = document.getElementById('client-approval-form').dataset.stage;
+                    const feedback = document.getElementById('client-feedback-input').value;
+                    const updateData = { [`${stage}Status`]: 'Concluído' };
+                    if (feedback) {
+                         const newComment = { text: feedback, author: 'Cliente', timestamp: new Date() };
+                         updateData.comments = arrayUnion(newComment);
+                    }
+                    try {
+                        await updateDoc(projectDocRef, updateData);
+                        showNotification("Etapa aprovada com sucesso!");
+                    } catch (err) {
+                        console.error("Erro ao aprovar etapa: ", err);
+                        showNotification("Erro ao aprovar etapa.", true);
+                    }
+                });
 
+                document.getElementById('reject-btn')?.addEventListener('click', async () => {
+                     const stage = document.getElementById('client-approval-form').dataset.stage;
+                     const feedback = document.getElementById('client-feedback-input').value;
+                     if (!feedback) {
+                          showNotification("Por favor, adicione um feedback para rejeitar a etapa.", true);
+                          return;
+                     }
+                     const updateData = { [`${stage}Status`]: 'Pendente' };
+                     const newComment = { text: feedback, author: 'Cliente', timestamp: new Date() };
+                     updateData.comments = arrayUnion(newComment);
+                     try {
+                         await updateDoc(projectDocRef, updateData);
+                         showNotification("Etapa rejeitada. Feedback enviado.");
+                     } catch (err) {
+                         console.error("Erro ao rejeitar etapa: ", err);
+                         showNotification("Erro ao rejeitar etapa.", true);
+                     }
+                });
             });
         };
         
@@ -1448,9 +2034,6 @@
             button.addEventListener('click', () => switchTab(button.dataset.tab));
         });
         homeBtn.addEventListener('click', () => switchTab('dashboard'));
-        addProjectForm.addEventListener('submit', handleAddProject);
-        portfolioForm.addEventListener('submit', handleSavePortfolio);
-        deletePortfolioBtn.addEventListener('click', handleDeletePortfolio);
         
         // Use a single listener on a parent container for dynamic project cards
         document.body.addEventListener('input', (e) => {
@@ -1465,14 +2048,34 @@
         });
          document.body.addEventListener('click', (e) => {
             if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
-                handleProjectInteraction(e);
+                const target = e.target;
+                const button = target.closest('button');
+                const projectId = target.dataset.id || button?.dataset.id || target.closest('[data-id]')?.dataset.id;
+                const project = projects.find(p => p.id === projectId);
+                if (button && button.classList.contains('edit-project-btn')) {
+                    if (project) {
+                        openEditModal(project);
+                    }
+                } else {
+                    handleProjectInteraction(e);
+                }
             }
+            
+            // Handle community tag clicks
+            if (e.target.closest('#community-tags-filter')) {
+                handleCommunityTagClick(e);
+            }
+            
         });
 
         calculatePriceBtn.addEventListener('click', handleCalculatePrice);
         calculateDiscountBtn.addEventListener('click', handleCalculateDiscount);
+        shareResourceForm.addEventListener('submit', handleResourceSubmission);
+        portfolioForm.addEventListener('submit', handleSavePortfolio);
+        deletePortfolioBtn.addEventListener('click', handleDeletePortfolio);
         searchPortfolioInput.addEventListener('input', applyFiltersAndRenderPortfolios);
         portfolioFilters.addEventListener('click', handlePortfolioFilterClick);
+        searchCommunityInput.addEventListener('input', applyCommunityFiltersAndRender);
 
         searchProjectsInput.addEventListener('input', (e) => {
             projectSearchTerm = e.target.value.toLowerCase();
