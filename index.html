@@ -10,24 +10,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Using a more modern approach by leveraging TailwindCSS classes directly in the HTML. 
-            Custom CSS is kept to a minimum for things Tailwind can't easily handle. */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d1117; /* A deep, modern dark background */
+            background-color: #0d1117;
             color: #c9d1d9;
         }
 
         .tab-content, #client-portal-container { display: none; }
         .tab-content.active { display: block; }
 
-        /* Custom scrollbar for a consistent look */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #1c2128; }
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #484f58; }
         
-        /* Custom styles for range input to match the new theme */
         input[type=range] {
             -webkit-appearance: none; appearance: none; width: 100%; cursor: pointer;
             outline: none; border-radius: 9999px; height: 6px; background: #30363d;
@@ -44,19 +40,12 @@
             color: #c9d1d9;
         }
 
-        /* Animations */
         .card-enter {
             animation: card-enter-anim 300ms ease-out forwards;
         }
         @keyframes card-enter-anim {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .highlight {
             animation: highlight-anim 1.5s ease-out;
@@ -65,14 +54,32 @@
             0% { background-color: rgba(47, 129, 247, 0.3); }
             100% { background-color: transparent; }
         }
+        .chat-bubble {
+            display: flex;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            max-width: 80%;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            word-wrap: break-word;
+        }
+        .chat-bubble.sent {
+            background-color: #2f81f7;
+            color: #fff;
+            margin-left: auto;
+        }
+        .chat-bubble.received {
+            background-color: #30363d;
+            color: #c9d1d9;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body class="bg-[#0d1117] text-[#c9d1d9]">
 
-    <!-- Global Notification -->
     <div id="notification" class="fixed top-5 right-5 bg-green-600 text-white py-2 px-5 rounded-lg shadow-2xl transform translate-x-[120%] transition-transform duration-500 ease-in-out z-50"></div>
 
-    <!-- Global Confirmation Modal -->
     <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl p-8 w-full max-w-sm text-center transform transition-all scale-95 opacity-0" id="modal-content">
             <p id="modal-message" class="text-lg mb-8"></p>
@@ -83,12 +90,10 @@
         </div>
     </div>
     
-    <!-- Auth Container -->
     <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 bg-grid-pattern">
         <div class="w-full max-w-md">
             <h1 class="text-5xl font-bold text-blue-500 text-center mb-8">Shibuya Hub</h1>
 
-            <!-- Pre-login section -->
             <div id="pre-login-section" style="display: none;" class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl shadow-2xl text-center">
                 <p class="mb-4">Continuar como:</p>
                 <p id="pre-login-email" class="font-bold text-lg text-white mb-6"></p>
@@ -96,7 +101,6 @@
                 <button id="pre-login-switch" class="w-full bg-[#30363d] hover:bg-[#484f58] font-bold py-2 px-4 rounded-lg transition-colors duration-300">Trocar de conta</button>
             </div>
             
-            <!-- Main Auth Wrapper -->
             <div id="main-auth-wrapper">
                 <div id="login-section" class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl shadow-2xl">
                     <form id="login-form">
@@ -134,9 +138,7 @@
         </div>
     </div>
     
-    <!-- App Container -->
     <div id="app-container" style="display: none;" class="flex h-screen">
-        <!-- Sidebar Navigation -->
         <nav class="w-20 bg-[#161b22] border-r border-[#30363d] flex flex-col items-center py-6 space-y-6">
             <button id="home-btn" class="text-blue-500 hover:text-blue-400 transition-colors" title="Início">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -165,7 +167,7 @@
             </div>
             <div class="mt-auto flex flex-col space-y-4">
                  <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="messages" title="Mensagens">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                  </button>
                  <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="profile" title="Perfil">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -179,28 +181,23 @@
             </div>
         </nav>
         
-        <!-- Main Content -->
         <main class="flex-1 overflow-y-auto p-6 lg:p-10">
             <header class="flex justify-between items-center mb-8">
                  <h1 id="page-title" class="text-3xl font-bold text-white">Visão Geral</h1>
                  <div class="relative">
                      <button id="notifications-btn" class="text-gray-400 hover:text-white transition-colors relative">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                         <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;"></span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;"></span>
                      </button>
                      <div id="notifications-panel" class="absolute right-0 mt-2 w-80 bg-[#161b22] border border-[#30363d] rounded-lg shadow-2xl p-3 z-10" style="display: none;"></div>
                  </div>
             </header>
 
-            <!-- Tab Content Area -->
             <div>
-                <!-- Dashboard -->
                 <div id="dashboard" class="tab-content active">
                     <div id="project-cards-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-                        <!-- Project cards will be rendered here -->
-                    </div>
+                        </div>
                 </div>
-                <!-- Projects -->
                 <div id="projects" class="tab-content space-y-10">
                     <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl max-w-3xl mx-auto shadow-lg">
                         <h2 class="text-2xl font-bold mb-6 text-white">Adicionar Novo Projeto</h2>
@@ -241,6 +238,17 @@
                             <button type="submit" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Adicionar Projeto</button>
                         </form>
                     </div>
+                     <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl max-w-3xl mx-auto shadow-lg mt-6">
+                        <h2 class="text-2xl font-bold mb-4 text-white">Agendar Lembrete</h2>
+                        <p class="text-sm text-gray-400 mb-4">Receba uma notificação no painel em uma data e hora específicas.</p>
+                        <form id="add-reminder-form">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <input type="text" id="reminder-text" placeholder="Descrição do lembrete" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <input type="datetime-local" id="reminder-datetime" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <button type="submit" class="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Agendar</button>
+                        </form>
+                    </div>
 
                     <div>
                         <h2 class="text-2xl font-bold mb-4 text-white">Meus Projetos</h2>
@@ -255,22 +263,18 @@
                         </div>
 
                         <div id="inprogress-projects-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-                            <!-- In-progress projects will be rendered here -->
-                        </div>
+                            </div>
 
                         <div id="completed-projects-section" class="mt-12" style="display: none;">
                             <h2 class="text-2xl font-bold mb-4 text-white">Projetos Concluídos</h2>
                             <div id="completed-projects-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-                                <!-- Completed projects will be rendered here -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
-                <!-- Agenda -->
                 <div id="agenda" class="tab-content">
                      <div id="calendar-container" class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl max-w-4xl mx-auto"></div>
                 </div>
-                <!-- Portfolios -->
                 <div id="portfolios" class="tab-content">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div class="lg:col-span-1 bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
@@ -296,12 +300,10 @@
                                 <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="Lyric">Lyric</button>
                             </div>
                             <div id="portfolios-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Public portfolios will be rendered here -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
-                <!-- Financial -->
                 <div id="financial" class="tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl text-center">
@@ -319,7 +321,6 @@
                         <div id="monthly-income-details" class="space-y-2"></div>
                     </div>
                 </div>
-                <!-- Calculator -->
                 <div id="calculator" class="tab-content max-w-4xl mx-auto">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
@@ -346,29 +347,40 @@
                         </div>
                     </div>
                 </div>
-                 <!-- Profile -->
+                 <div id="messages" class="tab-content">
+                    <div class="max-w-xl mx-auto bg-[#161b22] border border-[#30363d] p-6 rounded-xl h-[80vh] flex flex-col">
+                        <h2 class="text-2xl font-bold mb-4 text-white">Mensagens Diretas</h2>
+                        <div id="messages-container" class="flex-1 overflow-y-auto space-y-3 p-4 bg-[#0d1117] rounded-lg mb-4">
+                            <p class="text-center text-gray-500">Nenhuma conversa encontrada.</p>
+                        </div>
+                        <form id="message-form" class="flex gap-2">
+                            <input type="text" id="message-input" class="flex-1 p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" placeholder="Digite sua mensagem...">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">Enviar</button>
+                        </form>
+                    </div>
+                </div>
                  <div id="profile" class="tab-content max-w-2xl mx-auto">
                      <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl">
-                         <h2 class="text-2xl font-bold mb-6 text-white">Meu Perfil</h2>
-                         <form id="profile-form" class="space-y-6">
-                             <div class="flex items-center gap-6">
-                                 <img id="profile-pic-preview" src="https://placehold.co/100x100/161b22/c9d1d9?text=Foto" class="w-24 h-24 rounded-full object-cover bg-[#0d1117]">
-                                 <div>
-                                     <label for="profile-pic-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                                         Trocar Foto
-                                     </label>
-                                     <input type="file" id="profile-pic-upload" class="hidden" accept="image/*">
-                                 </div>
-                             </div>
-                             
-                             <p>Email: <span id="user-email" class="font-semibold text-white"></span></p>
+                          <h2 class="text-2xl font-bold mb-6 text-white">Meu Perfil</h2>
+                          <form id="profile-form" class="space-y-6">
+                              <div class="flex items-center gap-6">
+                                  <img id="profile-pic-preview" src="https://placehold.co/100x100/161b22/c9d1d9?text=Foto" class="w-24 h-24 rounded-full object-cover bg-[#0d1117]">
+                                  <div>
+                                      <label for="profile-pic-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                                          Trocar Foto
+                                      </label>
+                                      <input type="file" id="profile-pic-upload" class="hidden" accept="image/*">
+                                  </div>
+                              </div>
+                              
+                              <p>Email: <span id="user-email" class="font-semibold text-white"></span></p>
 
-                             <div>
-                                 <label for="profile-bio" class="block text-sm font-medium mb-2">Biografia</label>
-                                 <textarea id="profile-bio" rows="4" placeholder="Fale um pouco sobre si, suas especialidades e como os clientes podem entrar em contato." class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                             </div>
+                              <div>
+                                  <label for="profile-bio" class="block text-sm font-medium mb-2">Biografia</label>
+                                  <textarea id="profile-bio" rows="4" placeholder="Fale um pouco sobre si, suas especialidades e como os clientes podem entrar em contato." class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                              </div>
 
-                             <div class="border-t border-[#30363d] pt-6">
+                              <div class="border-t border-[#30363d] pt-6">
                                   <h3 class="text-xl font-bold text-white mb-4">Cores de Status do Prazo</h3>
                                   <p class="text-sm text-gray-400 mb-4">Personalize as cores dos cartões de projeto para se adequar ao seu fluxo de trabalho.</p>
                                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -385,28 +397,27 @@
                                           <input type="color" id="color-danger" value="#ef4444" class="w-full h-10 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg cursor-pointer">
                                       </div>
                                   </div>
-                             </div>
+                              </div>
 
-                             <div>
-                                 <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salvar Alterações</button>
-                             </div>
-                         </form>
+                              <div>
+                                  <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salvar Alterações</button>
+                              </div>
+                          </form>
                      </div>
                  </div>
-                 <!-- Comunidade -->
                  <div id="community" class="tab-content max-w-4xl mx-auto space-y-6">
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                        <h2 class="text-2xl font-bold mb-4 text-white">Comunidade</h2>
-                        <p class="text-gray-400">Encontre e compartilhe recursos valiosos para aprimorar suas habilidades de edição.</p>
-                        
-                        <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                         <h2 class="text-2xl font-bold mb-4 text-white">Comunidade</h2>
+                         <p class="text-gray-400">Encontre e compartilhe recursos valiosos para aprimorar suas habilidades de edição.</p>
+                         
+                         <div class="mt-6 flex flex-col sm:flex-row gap-4">
                             <input type="search" id="search-community-input" placeholder="Buscar por título ou tag..." class="w-full sm:w-1/2 p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <div id="community-tags-filter" class="flex flex-wrap items-center gap-2">
                                 <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="MMV">#MMV</button>
                                 <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="After Effects">#After Effects</button>
                                 <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="Edits">#Edits</button>
                             </div>
-                        </div>
+                         </div>
                     </div>
 
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
@@ -422,11 +433,9 @@
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                         <h3 class="text-xl font-bold mb-4">Posts da Comunidade</h3>
                         <div id="community-resources-container" class="space-y-4">
-                            <!-- Resources will be rendered here from Firestore -->
-                        </div>
+                            </div>
                     </div>
-                 </div>
-                 <!-- Tutorial -->
+                </div>
                  <div id="tutorial" class="tab-content">
                       <div class="max-w-4xl mx-auto space-y-8">
                           <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
@@ -473,9 +482,8 @@
                                    <li><strong>Gráfico de Ganhos Mensais:</strong> O gráfico de barras mostra seus ganhos mensais com base na data de entrega dos projetos concluídos, ajudando você a visualizar sua performance ao longo do tempo.</li>
                                </ul>
                           </div>
-                           
-                           <!-- NEW: Resources Tab -->
-                          <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            
+                           <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                               <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Comunidade</h3>
                               <p class="mb-2">Uma área para a comunidade de editores. Encontre tutoriais, dicas e compartilhe seus próprios conhecimentos.</p>
                               <ul class="list-disc list-inside space-y-2 text-gray-300">
@@ -483,7 +491,7 @@
                                    <li><strong>Compartilhar Conhecimento:</strong> Use o formulário abaixo para enviar um link de um tutorial ou recurso que você achou útil. A comunidade agradece!</li>
                                </ul>
                           </div>
-                           
+                            
                           <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                               <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Calculadora</h3>
                               <p class="mb-2">Ferramentas úteis para o dia a dia.</p>
@@ -492,7 +500,7 @@
                                    <li><strong>Calculadora de Desconto por Atraso:</strong> Se você tem uma política de descontos por atraso na entrega, esta calculadora ajuda a determinar o valor final, aplicando uma porcentagem de desconto por cada dia de atraso.</li>
                                </ul>
                           </div>
-                           
+                            
                           <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                               <h3 class="text-xl font-bold text-blue-400 mb-3">Portal do Cliente</h3>
                               <p class="mb-2">Compartilhe o progresso com seus clientes de forma profissional.</p>
@@ -503,39 +511,6 @@
                           </div>
                       </div>
                  </div>
-                 <!-- NEW: Resources tab content -->
-                 <div id="community" class="tab-content max-w-4xl mx-auto space-y-6">
-                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                        <h2 class="text-2xl font-bold mb-4 text-white">Comunidade</h2>
-                        <p class="text-gray-400">Encontre e compartilhe recursos valiosos para aprimorar suas habilidades de edição.</p>
-                        
-                        <div class="mt-6 flex flex-col sm:flex-row gap-4">
-                            <input type="search" id="search-community-input" placeholder="Buscar por título ou tag..." class="w-full sm:w-1/2 p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <div id="community-tags-filter" class="flex flex-wrap items-center gap-2">
-                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="MMV">#MMV</button>
-                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="After Effects">#After Effects</button>
-                                <button class="tag-filter-btn px-3 py-1 text-sm bg-[#30363d] hover:bg-[#484f58] rounded-full transition-colors" data-tag="Edits">#Edits</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                        <h3 class="text-xl font-bold mb-4">Novo Post</h3>
-                        <form id="share-resource-form" class="space-y-4">
-                            <input type="text" id="resource-title" placeholder="Título do Post" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
-                            <input type="url" id="resource-link" placeholder="Link (YouTube, Google Drive, etc.)" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
-                            <input type="text" id="resource-tags" placeholder="Tags (Ex: 'MMV', 'Transição', 'After Effects')" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Fazer Post</button>
-                        </form>
-                    </div>
-
-                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
-                        <h3 class="text-xl font-bold mb-4">Posts da Comunidade</h3>
-                        <div id="community-resources-container" class="space-y-4">
-                            <!-- Resources will be rendered here from Firestore -->
-                        </div>
-                    </div>
-                 </div>
             </div>
             <footer class="text-center py-6 text-sm text-gray-500">
                 <p>FEITO POR @LUCXSEDIITS</p>
@@ -543,7 +518,6 @@
         </main>
     </div>
 
-    <!-- Edit Project Modal (NEW) -->
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-40" style="display: none;">
         <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl p-8 w-full max-w-lg">
             <h2 class="text-2xl font-bold mb-6 text-white">Editar Projeto</h2>
@@ -562,17 +536,14 @@
         </div>
     </div>
     
-    <!-- Client Portal Container -->
     <div id="client-portal-container" class="min-h-screen p-4 md:p-8">
-        <!-- Client portal content will be injected here -->
-    </div>
+        </div>
     
-    <!-- Firebase SDK -->
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDoc, setLogLevel, arrayUnion, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDoc, setLogLevel, arrayUnion, writeBatch, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         
         // --- Your web app's Firebase configuration ---
@@ -597,6 +568,8 @@
         let projectTemplates = [];
         let allPublicPortfolios = [];
         let allCommunityResources = [];
+        let reminders = [];
+        let messages = [];
         let activePortfolioFilters = new Set();
         let activeCommunityFilters = new Set();
         let currentUserId = null;
@@ -605,6 +578,8 @@
         let unsubscribeFromTemplates = null;
         let unsubscribeFromPortfolios = null;
         let unsubscribeFromProfile = null;
+        let unsubscribeFromReminders = null;
+        let unsubscribeFromMessages = null;
         let noteUpdateTimeout = null;
         let monthlyIncomeChart = null;
         let timeUpdateInterval = null;
@@ -672,6 +647,9 @@
         const communityResourcesContainer = document.getElementById('community-resources-container');
         const searchCommunityInput = document.getElementById('search-community-input');
         const communityTagsFilter = document.getElementById('community-tags-filter');
+        const addReminderForm = document.getElementById('add-reminder-form');
+        const messagesContainer = document.getElementById('messages-container');
+        const messageForm = document.getElementById('message-form');
 
         // --- PAGE LOAD ROUTING ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -681,15 +659,12 @@
             const userId = params.get('userId');
 
             if (mode === 'client' && projectId && userId) {
-                // Client Portal Mode
                 authContainer.style.display = 'none';
                 appContainer.style.display = 'none';
                 clientPortalContainer.style.display = 'block';
                 loadClientPortal(userId, projectId);
             } else {
-                // Normal App Mode
                 clientPortalContainer.style.display = 'none';
-                // The onAuthStateChanged listener will handle showing auth or app
             }
         });
 
@@ -771,6 +746,8 @@
                 listenToTemplates();
                 listenToPortfolios();
                 listenToResources();
+                listenToReminders();
+                listenToMessages();
                 loadMyPortfolio();
                 
                 if (timeUpdateInterval) clearInterval(timeUpdateInterval);
@@ -791,10 +768,14 @@
                 if (unsubscribeFromTemplates) unsubscribeFromTemplates();
                 if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
                 if (unsubscribeFromResources) unsubscribeFromResources();
+                if (unsubscribeFromReminders) unsubscribeFromReminders();
+                if (unsubscribeFromMessages) unsubscribeFromMessages();
                 if (unsubscribeFromProfile) unsubscribeFromProfile();
                 projects = [];
                 projectTemplates = [];
                 allCommunityResources = [];
+                reminders = [];
+                messages = [];
                 renderDashboardCards();
                 renderProjectLists();
                 portfoliosContainer.innerHTML = '';
@@ -867,7 +848,7 @@
             if (userProfile.deadlineColors) {
                 document.getElementById('color-ok').value = userProfile.deadlineColors.ok;
                 document.getElementById('color-warning').value = userProfile.deadlineColors.warning;
-                document.getElementById('color-danger').value = user.deadlineColors.danger;
+                document.getElementById('color-danger').value = userProfile.deadlineColors.danger;
             }
         };
 
@@ -911,18 +892,16 @@
             const file = document.getElementById('profile-pic-upload').files[0];
             
             try {
-             // CORREÇÃO: Comece com a URL existente para não perdê-la.
                 const updatedProfileData = {
                     bio: newBio,
                     deadlineColors: newColors,
-                    photoURL: userProfile.photoURL || '' // Inicia com a URL da foto atual.
+                    photoURL: userProfile.photoURL || ''
                 };
 
                 if (file) {
-                   const storageRef = ref(storage, `users/${currentUserId}/profile.jpg`);
-                   await uploadBytes(storageRef, file);
-             // Se um novo arquivo foi enviado, atualiza a URL.
-                   updatedProfileData.photoURL = await getDownloadURL(storageRef);
+                    const storageRef = ref(storage, `users/${currentUserId}/profile.jpg`);
+                    await uploadBytes(storageRef, file);
+                    updatedProfileData.photoURL = await getDownloadURL(storageRef);
                 }
 
                 await updateDoc(doc(db, 'users', currentUserId), updatedProfileData);
@@ -938,6 +917,9 @@
         const getProjectsCollectionPath = () => currentUserId ? `users/${currentUserId}/projects` : null;
         const getTemplatesCollectionPath = () => currentUserId ? `users/${currentUserId}/templates` : null;
         const getResourcesCollectionPath = () => 'resources';
+        const getRemindersCollectionPath = () => currentUserId ? `users/${currentUserId}/reminders` : null;
+        const getMessagesCollectionPath = () => currentUserId ? `messages` : null;
+
 
         const listenToProjects = () => {
             if (unsubscribeFromProjects) unsubscribeFromProjects();
@@ -949,7 +931,6 @@
                 renderProjectLists();
                 renderFinancialDashboard();
                 generateAndRenderNotifications();
-                // Removed renderCalendar() to avoid errors if the element isn't in view
             }, (error) => {
                 console.error("Erro ao buscar projetos: ", error);
                 showNotification("Erro ao carregar projetos.", true);
@@ -965,6 +946,76 @@
                 renderTemplateOptions();
             });
         }
+        
+        const listenToReminders = () => {
+            if (unsubscribeFromReminders) unsubscribeFromReminders();
+            const path = getRemindersCollectionPath();
+            if (!path) return;
+            unsubscribeFromReminders = onSnapshot(query(collection(db, path), orderBy('timestamp')), (snapshot) => {
+                reminders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                generateAndRenderNotifications();
+            });
+        };
+        
+        const listenToMessages = () => {
+            if (unsubscribeFromMessages) unsubscribeFromMessages();
+            if (!currentUserId) return;
+            const path = getMessagesCollectionPath();
+            if (!path) return;
+            const q = query(collection(db, path), where('participants', 'array-contains', currentUserId), orderBy('timestamp'));
+            unsubscribeFromMessages = onSnapshot(q, (snapshot) => {
+                messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderMessages();
+            });
+        };
+
+        const renderMessages = () => {
+            messagesContainer.innerHTML = '';
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = `<p class="text-center text-gray-500">Nenhuma conversa encontrada.</p>`;
+                return;
+            }
+            messages.forEach(msg => {
+                const isSent = msg.senderId === currentUserId;
+                const bubbleClass = isSent ? 'sent' : 'received';
+                const alignmentClass = isSent ? 'ml-auto' : 'mr-auto';
+                const timestamp = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleString('pt-BR') : '';
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${bubbleClass} ${alignmentClass}`;
+                bubble.innerHTML = `
+                    <div class="flex flex-col">
+                        <p>${msg.text}</p>
+                        <span class="text-[10px] opacity-70 mt-1 self-end">${timestamp}</span>
+                    </div>
+                `;
+                messagesContainer.appendChild(bubble);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        };
+
+        const handleMessageSubmission = async (e) => {
+            e.preventDefault();
+            if (!currentUserId) return;
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const messageData = {
+                text,
+                senderId: currentUserId,
+                timestamp: serverTimestamp(),
+                participants: ['adminId', currentUserId]
+            };
+
+            try {
+                await addDoc(collection(db, getMessagesCollectionPath()), messageData);
+                input.value = '';
+            } catch (error) {
+                console.error("Error sending message: ", error);
+                showNotification("Erro ao enviar a mensagem.", true);
+            }
+        };
+
 
         const listenToPortfolios = () => {
             if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
@@ -1078,7 +1129,6 @@
                 if (a.order !== undefined && b.order !== undefined) {
                     return a.order - b.order;
                 }
-                // Fallback to sorting by deadline if 'order' is not available
                 const aDays = calculateDaysLeft(a.deadline).days;
                 const bDays = calculateDaysLeft(b.deadline).days;
                 return aDays - bDays;
@@ -1104,9 +1154,9 @@
                     </li>`).join('') || '<li class="text-xs text-gray-500">Nenhum ficheiro.</li>';
                 
                 const commentsHTML = (project.comments || []).map(comment => `
-                    <div class="text-xs p-2 rounded-md ${comment.author === 'Editor' ? 'bg-blue-900/40 text-right' : 'bg-gray-700/40'}">
+                    <div class="text-xs p-2 rounded-md ${comment.author === 'Editor' ? 'bg-blue-900/40 text-right' : 'bg-gray-700/40'}" style="word-wrap: break-word;">
                         <p>${comment.text}</p>
-                        <p class="text-gray-400 text-[10px] mt-1">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
+                        <p class="text-gray-400 text-[10px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
                     </div>
                 `).join('') || '<li class="text-xs text-gray-500">Nenhum comentário.</li>';
 
@@ -1123,12 +1173,12 @@
                             <h3 class="text-xl font-bold text-white">${project.name}</h3>
                             <div class="flex items-center gap-2">
                                 <button class="edit-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Editar Projeto">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                                </button>
-                                <button class="share-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Partilhar com Cliente">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                                </button>
-                                <button class="delete-project-btn text-gray-500 hover:text-red-500 transition-colors font-bold text-lg" data-id="${project.id}">&times;</button>
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                 </button>
+                                 <button class="share-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Partilhar com Cliente">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                                 </button>
+                                 <button class="delete-project-btn text-gray-500 hover:text-red-500 transition-colors font-bold text-lg" data-id="${project.id}">&times;</button>
                             </div>
                         </div>
                         <p class="text-sm text-gray-400 mb-1">Cliente: ${project.client || 'N/A'}</p>
@@ -1180,7 +1230,6 @@
         const renderProjectLists = () => {
             let displayProjects = [...projects];
 
-            // 1. Filter by Search Term
             if (projectSearchTerm) {
                 displayProjects = displayProjects.filter(p => 
                     (p.name || '').toLowerCase().includes(projectSearchTerm) ||
@@ -1188,7 +1237,6 @@
                 );
             }
 
-            // 2. Filter by Status
             let filteredInProgress = displayProjects.filter(p => p.progress < 100);
             let completed = displayProjects.filter(p => p.progress == 100);
 
@@ -1202,11 +1250,9 @@
                 filteredInProgress = [];
             }
             
-            // 3. Render cards
             renderCards(inprogressProjectsContainer, filteredInProgress);
             renderCards(completedProjectsContainer, completed);
             
-            // 4. Show/hide completed section
             completedProjectsSection.style.display = completed.length > 0 ? 'block' : 'none';
         };
 
@@ -1249,7 +1295,6 @@
                     const toIndex = reorderedProjects.findIndex(p => p.id === toId);
                     reorderedProjects.splice(toIndex, 0, draggedItem);
 
-                    // Re-assign order numbers
                     const batch = writeBatch(db);
                     const path = getProjectsCollectionPath();
                     reorderedProjects.forEach((project, index) => {
@@ -1378,9 +1423,9 @@
                 const date = new Date(month + '-02');
                 const monthName = date.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
                 return `<div class="flex justify-between items-center bg-[#0d1117] p-3 rounded-lg">
-                            <span class="capitalize">${monthName}</span>
-                            <span class="font-bold text-green-400">R$ ${monthly[month].toFixed(2)}</span>
-                        </div>`
+                             <span class="capitalize">${monthName}</span>
+                             <span class="font-bold text-green-400">R$ ${monthly[month].toFixed(2)}</span>
+                         </div>`
             }).join('');
         };
 
@@ -1424,7 +1469,6 @@
                  communityResourcesContainer.innerHTML = `<p class="text-center text-gray-500">Nenhum post ainda. Seja o primeiro a postar!</p>`;
                  return;
             }
-            // Sort resources by timestamp, newest first
             const sortedResources = resources.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
 
             sortedResources.forEach(resource => {
@@ -1505,7 +1549,6 @@
             };
 
             if (isAddForm) {
-                // Add new project
                 if (projectValue <= 1) {
                     showConfirmationModal(
                         `Tem certeza que deseja adicionar o projeto "${projectName}" com o valor de R$ ${projectValue.toFixed(2)}?`,
@@ -1522,7 +1565,7 @@
                                     files: [],
                                     comments: [],
                                     public: false,
-                                    order: projects.length // NEW: set initial order
+                                    order: projects.length
                                 };
                                 await addDoc(collection(db, path), fullNewProject);
                                 addProjectForm.reset();
@@ -1537,31 +1580,30 @@
                     );
                 } else {
                      try {
-                        const fullNewProject = {
-                            ...newProjectData,
-                            progress: 0,
-                            storyboardStatus: document.getElementById('storyboard-status').value,
-                            recortesStatus: document.getElementById('recortes-status').value,
-                            cameraStatus: document.getElementById('camera-status').value,
-                            ccStatus: document.getElementById('cc-status').value,
-                            notes: "",
-                            files: [],
-                            comments: [],
-                            public: false,
-                            order: projects.length // NEW: set initial order
-                        };
-                        await addDoc(collection(db, path), fullNewProject);
-                        addProjectForm.reset();
-                        templateSelect.value = "";
-                        switchTab('dashboard');
-                        showNotification("Projeto adicionado com sucesso!");
-                    } catch (error) {
-                        console.error("Error adding document: ", error);
-                        showNotification("Erro ao adicionar projeto.", true);
-                    }
+                         const fullNewProject = {
+                             ...newProjectData,
+                             progress: 0,
+                             storyboardStatus: document.getElementById('storyboard-status').value,
+                             recortesStatus: document.getElementById('recortes-status').value,
+                             cameraStatus: document.getElementById('camera-status').value,
+                             ccStatus: document.getElementById('cc-status').value,
+                             notes: "",
+                             files: [],
+                             comments: [],
+                             public: false,
+                             order: projects.length
+                         };
+                         await addDoc(collection(db, path), fullNewProject);
+                         addProjectForm.reset();
+                         templateSelect.value = "";
+                         switchTab('dashboard');
+                         showNotification("Projeto adicionado com sucesso!");
+                     } catch (error) {
+                         console.error("Error adding document: ", error);
+                         showNotification("Erro ao adicionar projeto.", true);
+                     }
                 }
             } else {
-                // Edit existing project
                 try {
                     await updateDoc(doc(db, path, currentEditProjectId), newProjectData);
                     editModal.style.display = 'none';
@@ -1577,8 +1619,29 @@
 
         addProjectForm.addEventListener('submit', handleAddOrEditProject);
         editProjectForm.addEventListener('submit', handleAddOrEditProject);
+        addReminderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = document.getElementById('reminder-text').value;
+            const datetime = document.getElementById('reminder-datetime').value;
+            if (!text || !datetime || !currentUserId) {
+                showNotification("Preencha todos os campos do lembrete.", true);
+                return;
+            }
+            try {
+                await addDoc(collection(db, getRemindersCollectionPath()), {
+                    text,
+                    timestamp: new Date(datetime),
+                    createdAt: serverTimestamp(),
+                    isDismissed: false
+                });
+                addReminderForm.reset();
+                showNotification("Lembrete agendado com sucesso!");
+            } catch (error) {
+                console.error("Erro ao agendar lembrete:", error);
+                showNotification("Erro ao agendar lembrete.", true);
+            }
+        });
 
-        // NEW: Open the edit modal
         const openEditModal = (project) => {
             isEditing = true;
             currentEditProjectId = project.id;
@@ -1589,7 +1652,6 @@
             editModal.style.display = 'flex';
         };
 
-        // NEW: Close the edit modal
         cancelEditBtn.addEventListener('click', () => {
             editModal.style.display = 'none';
             isEditing = false;
@@ -1646,7 +1708,6 @@
             const projectDocRef = doc(db, path, projectId);
             const project = projects.find(p => p.id === projectId);
 
-            // NEW: Handle Edit button click
             if (button && button.classList.contains('edit-project-btn')) {
                 if (project) {
                     openEditModal(project);
@@ -1736,7 +1797,7 @@
                     try {
                         await updateDoc(projectDocRef, { notes: target.value });
                     } catch (error) { console.error(`Error updating notes: `, error); }
-                }, 500); // Debounce update
+                }, 500);
             }
 
             if (target.classList.contains('file-upload-input')) {
@@ -1844,12 +1905,23 @@
         
         const generateAndRenderNotifications = () => {
             const notifications = [];
+            
+            // Notifications from project deadlines
             projects.forEach(p => {
                 const deadlineInfo = calculateDaysLeft(p.deadline);
                 if (deadlineInfo.days <= 3 && deadlineInfo.days >= 0 && p.progress < 100) {
-                    notifications.push({ message: `Prazo para "${p.name}" a terminar!` });
+                    notifications.push({ message: `Prazo para "${p.name}" a terminar!`, date: p.deadline });
                 } else if (deadlineInfo.days < 0 && p.progress < 100) {
-                    notifications.push({ message: `Projeto "${p.name}" está atrasado!`, isUrgent: true });
+                    notifications.push({ message: `Projeto "${p.name}" está atrasado!`, date: p.deadline, isUrgent: true });
+                }
+            });
+
+            // Notifications from reminders
+            const now = new Date();
+            reminders.forEach(r => {
+                const reminderDate = new Date(r.timestamp.seconds * 1000);
+                if (reminderDate.getTime() <= now.getTime() && !r.isDismissed) {
+                     notifications.push({ message: `Lembrete: ${r.text}`, date: reminderDate.toISOString().split('T')[0], isReminder: true, id: r.id });
                 }
             });
 
@@ -1857,8 +1929,28 @@
             notificationBadge.textContent = notifications.length;
 
             notificationsPanel.innerHTML = notifications.length > 0
-                ? notifications.map(n => `<div class="p-2 border-b border-[#30363d] text-sm ${n.isUrgent ? 'text-red-400' : ''}">${n.message}</div>`).join('')
-                : '<div class="p-2 text-sm">Nenhuma notificação.</div>';
+                ? notifications.map(n => `
+                    <div class="p-2 border-b border-[#30363d] text-sm ${n.isUrgent ? 'text-red-400' : ''} flex justify-between items-center">
+                        <div>
+                            <p>${n.message}</p>
+                            <p class="text-[10px] text-gray-500">${new Date(n.date).toLocaleString('pt-BR')}</p>
+                        </div>
+                        ${n.isReminder ? `<button class="dismiss-reminder-btn text-gray-500 hover:text-white" data-id="${n.id}">&times;</button>` : ''}
+                    </div>
+                `).join('')
+                : '<div class="p-2 text-sm text-center text-gray-500">Nenhuma notificação.</div>';
+        };
+
+        const handleDismissReminder = async (reminderId) => {
+            const path = getRemindersCollectionPath();
+            if (!path || !reminderId) return;
+            try {
+                await updateDoc(doc(db, path, reminderId), { isDismissed: true });
+                showNotification("Lembrete descartado.");
+            } catch (error) {
+                console.error("Erro ao descartar lembrete: ", error);
+                showNotification("Erro ao descartar lembrete.", true);
+            }
         };
 
         // --- CLIENT PORTAL LOGIC ---
@@ -1884,13 +1976,12 @@
                     </a>`).join('') || '<p class="text-gray-400">Nenhum ficheiro disponível.</p>';
                 
                 const commentsHTML = (project.comments || []).map(comment => `
-                         <div class="p-3 rounded-lg ${comment.author === 'Editor' ? 'bg-blue-900/40 ml-auto' : 'bg-gray-700/40 mr-auto'}" style="max-width: 80%;">
-                             <p class="text-sm">${comment.text}</p>
-                             <p class="text-gray-400 text-[11px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
-                         </div>
+                             <div class="p-3 rounded-lg ${comment.author === 'Editor' ? 'bg-blue-900/40 ml-auto' : 'bg-gray-700/40 mr-auto'}" style="max-width: 80%;">
+                                 <p class="text-sm">${comment.text}</p>
+                                 <p class="text-gray-400 text-[11px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
+                             </div>
                 `).join('');
 
-                // NEW: Logic for client approval buttons and message
                 let approvalSectionHTML = '';
                 const stages = ['storyboard', 'recortes', 'camera', 'cc'];
                 let currentStage = '';
@@ -2035,7 +2126,6 @@
         });
         homeBtn.addEventListener('click', () => switchTab('dashboard'));
         
-        // Use a single listener on a parent container for dynamic project cards
         document.body.addEventListener('input', (e) => {
             if (e.target.closest('#project-cards-container') || e.target.closest('#inprogress-projects-container') || e.target.closest('#completed-projects-container')) {
                 handleProjectInteraction(e);
@@ -2061,11 +2151,13 @@
                 }
             }
             
-            // Handle community tag clicks
             if (e.target.closest('#community-tags-filter')) {
                 handleCommunityTagClick(e);
             }
             
+            if (e.target.classList.contains('dismiss-reminder-btn')) {
+                handleDismissReminder(e.target.dataset.id);
+            }
         });
 
         calculatePriceBtn.addEventListener('click', handleCalculatePrice);
@@ -2076,6 +2168,7 @@
         searchPortfolioInput.addEventListener('input', applyFiltersAndRenderPortfolios);
         portfolioFilters.addEventListener('click', handlePortfolioFilterClick);
         searchCommunityInput.addEventListener('input', applyCommunityFiltersAndRender);
+        messageForm.addEventListener('submit', handleMessageSubmission);
 
         searchProjectsInput.addEventListener('input', (e) => {
             projectSearchTerm = e.target.value.toLowerCase();
@@ -2085,7 +2178,6 @@
         projectFilters.addEventListener('click', (e) => {
             if(e.target.tagName === 'BUTTON') {
                 activeProjectFilter = e.target.dataset.filter;
-                // Style active button
                 projectFilters.querySelectorAll('button').forEach(btn => {
                     btn.classList.remove('bg-blue-600', 'text-white');
                     btn.classList.add('hover:bg-[#30363d]');
@@ -2123,8 +2215,7 @@
             }
         });
 
-        // --- INITIAL LOAD ---
-        switchTab('dashboard'); // Set initial tab
+        switchTab('dashboard');
 
     </script>
 </body>
