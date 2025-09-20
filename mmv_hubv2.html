@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shibuya Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Using a more modern approach by leveraging TailwindCSS classes directly in the HTML. 
+           Custom CSS is kept to a minimum for things Tailwind can't easily handle. */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* A deep, modern dark background */
+            color: #c9d1d9;
+        }
+
+        .tab-content, #client-portal-container { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Custom scrollbar for a consistent look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1c2128; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+        
+        /* Custom styles for range input to match the new theme */
+        input[type=range] {
+            -webkit-appearance: none; appearance: none; width: 100%; cursor: pointer;
+            outline: none; border-radius: 9999px; height: 6px; background: #30363d;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; height: 18px; width: 18px;
+            background-color: #2f81f7; border-radius: 50%; border: 2px solid #161b22;
+            transition: transform 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        
+        select option {
+            background: #161b22;
+            color: #c9d1d9;
+        }
+    </style>
+</head>
+<body class="bg-[#0d1117] text-[#c9d1d9]">
+
+    <!-- Global Notification -->
+    <div id="notification" class="fixed top-5 right-5 bg-green-600 text-white py-2 px-5 rounded-lg shadow-2xl transform translate-x-[120%] transition-transform duration-500 ease-in-out z-50"></div>
+
+    <!-- Global Confirmation Modal -->
+    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl p-8 w-full max-w-sm text-center transform transition-all scale-95 opacity-0" id="modal-content">
+            <p id="modal-message" class="text-lg mb-8"></p>
+            <div class="flex justify-center gap-4">
+                <button id="modal-cancel-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">Cancelar</button>
+                <button id="modal-confirm-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Auth Container -->
+    <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 bg-grid-pattern">
+        <div class="w-full max-w-md">
+            <h1 class="text-5xl font-bold text-blue-500 text-center mb-8">Shibuya Hub</h1>
+
+            <!-- Pre-login section -->
+            <div id="pre-login-section" style="display: none;" class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl shadow-2xl text-center">
+                <p class="mb-4">Continuar como:</p>
+                <p id="pre-login-email" class="font-bold text-lg text-white mb-6"></p>
+                <button id="pre-login-yes" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 mb-3">Sim, sou eu</button>
+                <button id="pre-login-switch" class="w-full bg-[#30363d] hover:bg-[#484f58] font-bold py-2 px-4 rounded-lg transition-colors duration-300">Trocar de conta</button>
+            </div>
+            
+            <!-- Main Auth Wrapper -->
+            <div id="main-auth-wrapper">
+                <div id="login-section" class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl shadow-2xl">
+                    <form id="login-form">
+                        <h2 class="text-2xl font-semibold mb-6 text-center text-white">Entrar na sua conta</h2>
+                        <div class="mb-4">
+                            <input id="login-email" type="email" placeholder="Email" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <input id="login-password" type="password" placeholder="Senha" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">Entrar</button>
+                        <p id="login-error" class="text-red-500 text-sm mt-4 text-center"></p>
+                    </form>
+                    <div class="text-center mt-6">
+                        <a href="#" id="show-signup" class="text-blue-400 hover:underline">Não tem uma conta? Crie uma agora!</a>
+                    </div>
+                </div>
+                <div id="signup-section" style="display: none;" class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl shadow-2xl">
+                    <form id="signup-form">
+                        <h2 class="text-2xl font-semibold mb-6 text-center text-white">Criar Conta</h2>
+                        <div class="mb-4">
+                            <input id="signup-email" type="email" placeholder="Email" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <input id="signup-password" type="password" placeholder="Senha (mínimo 6 caracteres)" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">Criar Conta</button>
+                        <p id="signup-error" class="text-red-500 text-sm mt-4 text-center"></p>
+                    </form>
+                     <div class="text-center mt-6">
+                         <a href="#" id="show-login" class="text-blue-400 hover:underline">Já tem uma conta? Entrar</a>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- App Container -->
+    <div id="app-container" style="display: none;" class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <nav class="w-20 bg-[#161b22] border-r border-[#30363d] flex flex-col items-center py-6 space-y-6">
+            <button id="home-btn" class="text-blue-500 hover:text-blue-400 transition-colors" title="Início">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.5 19H9a7 7 0 1 1 0-14h8.5"></path>
+                </svg>
+            </button>
+            <div class="flex flex-col space-y-4">
+                 <button class="sidebar-link active p-3 rounded-lg text-white bg-blue-600" data-tab="dashboard" title="Visão Geral">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                 </button>
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="projects" title="Projetos">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                 </button>
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="portfolios" title="Portfólios">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                 </button>
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="financial" title="Financeiro">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                 </button>
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="calculator" title="Calculadora">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="8" y2="14"></line><line x1="16" y1="18" x2="8" y2="18"></line><line x1="10" y1="10" x2="14" y2="10"></line></svg>
+                 </button>
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="tutorial" title="Tutorial">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                 </button>
+            </div>
+            <div class="mt-auto flex flex-col space-y-4">
+                 <button class="sidebar-link p-3 rounded-lg hover:bg-[#30363d] transition-colors" data-tab="profile" title="Perfil">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                 </button>
+                 <button id="logout-btn" class="p-3 rounded-lg text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Sair">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                 </button>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+            <header class="flex justify-between items-center mb-8">
+                 <h1 id="page-title" class="text-3xl font-bold text-white">Visão Geral</h1>
+                 <div class="relative">
+                     <button id="notifications-btn" class="text-gray-400 hover:text-white transition-colors relative">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;"></span>
+                     </button>
+                     <div id="notifications-panel" class="absolute right-0 mt-2 w-80 bg-[#161b22] border border-[#30363d] rounded-lg shadow-2xl p-3 z-10" style="display: none;"></div>
+                 </div>
+            </header>
+
+            <!-- Tab Content Area -->
+            <div>
+                <!-- Dashboard -->
+                <div id="dashboard" class="tab-content active">
+                    <div id="project-cards-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                        <!-- Project cards will be rendered here -->
+                    </div>
+                </div>
+                <!-- Projects -->
+                <div id="projects" class="tab-content">
+                    <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl max-w-3xl mx-auto shadow-lg">
+                        <h2 class="text-2xl font-bold mb-6 text-white">Adicionar Novo Projeto</h2>
+                        <form id="add-project-form">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <input type="text" id="project-name" placeholder="Nome do Projeto" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <input type="text" id="client-name" placeholder="Nome do Cliente" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="date" id="deadline" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <input type="number" id="project-value" placeholder="Valor (R$)" class="p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div class="mb-6">
+                                <label for="template-select" class="block text-sm font-medium mb-2">Usar Template</label>
+                                <select id="template-select" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Nenhum</option>
+                                </select>
+                            </div>
+                            <div class="border-t border-[#30363d] pt-4 mt-4">
+                                <h3 class="text-lg font-semibold mb-4">Status Iniciais</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="storyboard-status" class="block text-sm mb-1">Storyboard</label>
+                                        <select id="storyboard-status" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg"><option>Pendente</option><option>Em Andamento</option><option>Concluído</option></select>
+                                    </div>
+                                    <div>
+                                        <label for="recortes-status" class="block text-sm mb-1">Recortes</label>
+                                        <select id="recortes-status" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg"><option>Pendente</option><option>Em Andamento</option><option>Concluído</option></select>
+                                    </div>
+                                    <div>
+                                        <label for="camera-status" class="block text-sm mb-1">Câmera</label>
+                                        <select id="camera-status" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg"><option>Pendente</option><option>Em Andamento</option><option>Concluído</option></select>
+                                    </div>
+                                    <div>
+                                        <label for="cc-status" class="block text-sm mb-1">CC (Color Correction)</label>
+                                        <select id="cc-status" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg"><option>Pendente</option><option>Em Andamento</option><option>Concluído</option></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Adicionar Projeto</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Portfolios -->
+                <div id="portfolios" class="tab-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1 bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                             <h2 class="text-2xl font-bold mb-4 text-white">Meu Portfólio</h2>
+                             <p class="text-sm mb-4">Publique seu portfólio para que outros editores e clientes possam encontrar você.</p>
+                             <form id="portfolio-form" class="space-y-4">
+                                 <input type="text" id="portfolio-name" placeholder="Seu nome de editor" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                                 <input type="url" id="portfolio-link" placeholder="Link do seu Portfólio" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg" required>
+                                 <input type="text" id="portfolio-specialties" placeholder="Especialidades (Ex: AMV, Edits)" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                 <input type="text" id="portfolio-price" placeholder="Informação de Preço" class="w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                 <div class="flex gap-2 pt-2">
+                                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Salvar</button>
+                                     <button type="button" id="delete-portfolio-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Remover</button>
+                                 </div>
+                             </form>
+                        </div>
+                        <div class="lg:col-span-2">
+                            <h2 class="text-2xl font-bold mb-4 text-white">Encontrar Editores</h2>
+                            <input type="search" id="search-portfolio-input" placeholder="Buscar por nome ou especialidade..." class="w-full p-3 mb-4 bg-[#161b22] border border-[#30363d] rounded-lg">
+                            <div id="portfolio-filters" class="flex flex-wrap gap-2 mb-6">
+                                <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="MMV">MMV</button>
+                                <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="AMV">AMV</button>
+                                <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="Lyric">Lyric</button>
+                            </div>
+                            <div id="portfolios-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Public portfolios will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Financial -->
+                <div id="financial" class="tab-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl text-center">
+                            <h3 class="text-lg">Total Ganho (Concluídos)</h3>
+                            <p id="total-earned" class="text-4xl font-bold text-green-400 mt-2">R$ 0.00</p>
+                        </div>
+                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl text-center">
+                            <h3 class="text-lg">Potencial (Em Andamento)</h3>
+                            <p id="total-potential" class="text-4xl font-bold text-yellow-400 mt-2">R$ 0.00</p>
+                         </div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 text-white">Ganhos Mensais</h3>
+                        <canvas id="monthly-income-chart" class="mb-6"></canvas>
+                        <div id="monthly-income-details" class="space-y-2"></div>
+                    </div>
+                </div>
+                <!-- Calculator -->
+                <div id="calculator" class="tab-content max-w-4xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h2 class="text-xl font-bold mb-4 text-white">Calculadora de Preço por Tempo</h2>
+                            <div class="space-y-3">
+                                <input type="number" id="calc-price-per-minute" placeholder="Preço por minuto (R$)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                <div class="flex gap-2">
+                                    <input type="number" id="calc-minutes" placeholder="Minutos" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                    <input type="number" id="calc-seconds" placeholder="Segundos" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                </div>
+                                <button id="calculate-price-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-semibold">Calcular Preço</button>
+                                <div id="price-result" class="mt-4 text-center pt-2"></div>
+                            </div>
+                        </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                             <h2 class="text-xl font-bold mb-4 text-white">Calculadora de Desconto por Atraso</h2>
+                             <div class="space-y-3">
+                                 <input type="number" id="calc-original-value" placeholder="Valor original (R$)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                 <input type="number" id="calc-delay" placeholder="Dias de atraso" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                 <input type="number" id="calc-discount-percent" placeholder="Desconto por dia (%)" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg">
+                                 <button id="calculate-discount-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-semibold">Calcular Desconto</button>
+                                 <div id="discount-result" class="mt-4 text-center pt-2"></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Profile -->
+                 <div id="profile" class="tab-content max-w-md mx-auto bg-[#161b22] border border-[#30363d] p-8 rounded-xl">
+                     <h2 class="text-2xl font-bold mb-4 text-white">Perfil</h2>
+                     <div>
+                         <p>Email: <span id="user-email" class="font-semibold text-white"></span></p>
+                         <p class="mt-6 text-sm text-gray-400">Funcionalidades como "alterar senha" e "deletar conta" serão adicionadas em breve.</p>
+                     </div>
+                 </div>
+                 <!-- Tutorial -->
+                 <div id="tutorial" class="tab-content">
+                    <div class="max-w-4xl mx-auto space-y-8">
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h2 class="text-2xl font-bold text-white mb-4">Bem-vindo ao Shibuya Hub!</h2>
+                            <p>Este tutorial irá guiá-lo através de todas as funcionalidades disponíveis para que você possa gerenciar seus projetos de edição com eficiência.</p>
+                        </div>
+
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Dashboard (Visão Geral)</h3>
+                            <p class="mb-2">Esta é a sua tela inicial. Aqui você vê todos os seus projetos em formato de "cards".</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Cards de Projeto:</strong> Cada card mostra o nome do projeto, cliente, valor e o prazo de entrega. A cor da borda indica o status do prazo (verde para tranquilo, amarelo para próximo, vermelho para atrasado).</li>
+                                <li><strong>Status das Etapas:</strong> Você pode alterar o status de cada etapa (Storyboard, Recortes, Câmera, CC) diretamente no card.</li>
+                                <li><strong>Progresso:</strong> Arraste a barra de progresso para atualizar o quão completo está o projeto.</li>
+                                <li><strong>Ações Rápidas:</strong> Use os botões para concluir o projeto, salvá-lo como um template para uso futuro, compartilhar com o cliente ou deletar o projeto.</li>
+                                <li><strong>Ficheiros e Comentários:</strong> Anexe arquivos importantes e veja os comentários recentes diretamente no card.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Projetos</h3>
+                            <p class="mb-2">É aqui que a mágica começa. Adicione novos projetos preenchendo o formulário.</p>
+                             <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Formulário:</strong> Insira os detalhes básicos como nome, cliente, prazo e valor.</li>
+                                <li><strong>Templates:</strong> Se você já salvou um projeto como template, pode selecioná-lo no menu "Usar Template" para preencher automaticamente as informações de status e valor.</li>
+                                <li><strong>Status Iniciais:</strong> Defina o estado inicial para cada etapa do novo projeto.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Portfólios</h3>
+                            <p class="mb-2">Esta área é para se conectar com a comunidade.</p>
+                             <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Meu Portfólio:</strong> Preencha suas informações para que outros editores e potenciais clientes possam encontrar você. Adicione seu nome, link para o portfólio, especialidades e informações de preço.</li>
+                                <li><strong>Encontrar Editores:</strong> Procure por outros editores usando a barra de busca ou os filtros de especialidade. É uma ótima maneira de encontrar parceiros para projetos ou se inspirar.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Financeiro</h3>
+                            <p class="mb-2">Tenha uma visão clara dos seus ganhos.</p>
+                             <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Painéis de Ganhos:</strong> Veja o total ganho com projetos já concluídos e o valor potencial dos projetos que ainda estão em andamento.</li>
+                                <li><strong>Gráfico de Ganhos Mensais:</strong> O gráfico de barras mostra seus ganhos mensais com base na data de entrega dos projetos concluídos, ajudando você a visualizar sua performance ao longo do tempo.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Calculadora</h3>
+                            <p class="mb-2">Ferramentas úteis para o dia a dia.</p>
+                             <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Calculadora de Preço por Tempo:</strong> Não sabe quanto cobrar por um vídeo de 2 minutos e 30 segundos? Insira seu preço por minuto e a duração do vídeo para obter o valor total instantaneamente.</li>
+                                <li><strong>Calculadora de Desconto por Atraso:</strong> Se você tem uma política de descontos por atraso na entrega, esta calculadora ajuda a determinar o valor final, aplicando uma porcentagem de desconto por cada dia de atraso.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Portal do Cliente</h3>
+                            <p class="mb-2">Compartilhe o progresso com seus clientes de forma profissional.</p>
+                             <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li><strong>Como compartilhar:</strong> No card do projeto, clique no ícone de compartilhamento (três pontos conectados). Isso copiará um link único para a sua área de transferência.</li>
+                                <li><strong>O que o cliente vê:</strong> Ao acessar o link, seu cliente verá uma página dedicada ao projeto dele, com o progresso geral, status de cada etapa, arquivos para download e uma caixa de comentários para feedback. Tudo isso sem precisar de login!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="text-center py-6 text-sm text-gray-500">
+                <p>FEITO POR @LUCXSEDIITS</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Client Portal Container -->
+    <div id="client-portal-container" class="min-h-screen p-4 md:p-8">
+        <!-- Client portal content will be injected here -->
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDoc, setLogLevel, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // --- Your web app's Firebase configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBe14b2ITHUch8-LytK5ZrtCgfvxUFrq8s",
+            authDomain: "mmvhub-56702.firebaseapp.com",
+            projectId: "mmvhub-56702",
+            storageBucket: "mmvhub-56702.appspot.com",
+            messagingSenderId: "786807517566",
+            appId: "1:786807517566:web:6e29c5e2d5d13203c9032f"
+        };
+
+        // --- FIREBASE INITIALIZATION ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        setLogLevel('debug');
+
+        // --- GLOBAL STATE ---
+        let projects = [];
+        let projectTemplates = [];
+        let allPublicPortfolios = [];
+        let activePortfolioFilters = new Set();
+        let currentUserId = null;
+        let unsubscribeFromProjects = null;
+        let unsubscribeFromTemplates = null;
+        let unsubscribeFromPortfolios = null;
+        let noteUpdateTimeout = null;
+        let monthlyIncomeChart = null;
+
+        // --- DOM ELEMENTS ---
+        const notification = document.getElementById('notification');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalMessage = document.getElementById('modal-message');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const clientPortalContainer = document.getElementById('client-portal-container');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const logoutBtn = document.getElementById('logout-btn');
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginBtn = document.getElementById('show-login');
+        const loginErrorMsg = document.getElementById('login-error');
+        const signupErrorMsg = document.getElementById('signup-error');
+        const userEmailSpan = document.getElementById('user-email');
+        const notificationsBtn = document.getElementById('notifications-btn');
+        const notificationBadge = document.getElementById('notification-badge');
+        const notificationsPanel = document.getElementById('notifications-panel');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const pageTitle = document.getElementById('page-title');
+        const addProjectForm = document.getElementById('add-project-form');
+        const projectCardsContainer = document.getElementById('project-cards-container');
+        const templateSelect = document.getElementById('template-select');
+        const portfolioForm = document.getElementById('portfolio-form');
+        const deletePortfolioBtn = document.getElementById('delete-portfolio-btn');
+        const portfoliosContainer = document.getElementById('portfolios-container');
+        const searchPortfolioInput = document.getElementById('search-portfolio-input');
+        const portfolioFilters = document.getElementById('portfolio-filters');
+        const calculatePriceBtn = document.getElementById('calculate-price-btn');
+        const calculateDiscountBtn = document.getElementById('calculate-discount-btn');
+        const totalEarnedEl = document.getElementById('total-earned');
+        const totalPotentialEl = document.getElementById('total-potential');
+        const monthlyIncomeDetailsEl = document.getElementById('monthly-income-details');
+        const preLoginSection = document.getElementById('pre-login-section');
+        const mainAuthWrapper = document.getElementById('main-auth-wrapper');
+        const preLoginEmail = document.getElementById('pre-login-email');
+        const preLoginYesBtn = document.getElementById('pre-login-yes');
+        const preLoginSwitchBtn = document.getElementById('pre-login-switch');
+        const homeBtn = document.getElementById('home-btn');
+        
+        // --- PAGE LOAD ROUTING ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const mode = params.get('mode');
+            const projectId = params.get('projectId');
+            const userId = params.get('userId');
+
+            if (mode === 'client' && projectId && userId) {
+                // Client Portal Mode
+                authContainer.style.display = 'none';
+                appContainer.style.display = 'none';
+                clientPortalContainer.style.display = 'block';
+                loadClientPortal(userId, projectId);
+            } else {
+                // Normal App Mode
+                clientPortalContainer.style.display = 'none';
+                // The onAuthStateChanged listener will handle showing auth or app
+            }
+        });
+
+        // --- PRE-LOGIN LOGIC ---
+        const lastUserEmail = localStorage.getItem('lastUserEmail');
+        if (lastUserEmail) {
+            preLoginEmail.textContent = lastUserEmail;
+            preLoginSection.style.display = 'block';
+            mainAuthWrapper.style.display = 'none';
+        } else {
+            mainAuthWrapper.style.display = 'block';
+        }
+
+        preLoginYesBtn.addEventListener('click', () => {
+            preLoginSection.style.display = 'none';
+            mainAuthWrapper.style.display = 'block';
+            document.getElementById('login-email').value = lastUserEmail;
+            document.getElementById('login-password').focus();
+        });
+
+        preLoginSwitchBtn.addEventListener('click', () => {
+            localStorage.removeItem('lastUserEmail');
+            preLoginSection.style.display = 'none';
+            mainAuthWrapper.style.display = 'block';
+            document.getElementById('login-form').reset();
+            document.getElementById('login-email').focus();
+        });
+
+        // --- UI FUNCTIONS ---
+        const showNotification = (message, isError = false) => {
+            notification.textContent = message;
+            notification.classList.toggle('bg-red-600', isError);
+            notification.classList.toggle('bg-green-600', !isError);
+            notification.classList.remove('translate-x-[120%]');
+            setTimeout(() => {
+                notification.classList.add('translate-x-[120%]');
+            }, 3000);
+        };
+
+        let confirmCallback = null;
+        const showConfirmationModal = (message, onConfirm) => {
+            modalMessage.textContent = message;
+            confirmCallback = onConfirm;
+            confirmationModal.style.display = 'flex';
+            setTimeout(() => {
+                 modalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        };
+
+        const hideConfirmationModal = () => {
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                confirmationModal.style.display = 'none';
+                confirmCallback = null;
+            }, 200);
+        };
+
+        modalConfirmBtn.addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            hideConfirmationModal();
+        });
+
+        modalCancelBtn.addEventListener('click', hideConfirmationModal);
+
+        // --- AUTHENTICATION ---
+        onAuthStateChanged(auth, async (user) => {
+            // This logic only runs in normal app mode
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('mode') === 'client') return;
+
+            if (user) {
+                localStorage.setItem('lastUserEmail', user.email);
+                currentUserId = user.uid;
+                userEmailSpan.textContent = user.email;
+                authContainer.style.display = 'none';
+                appContainer.style.display = 'flex';
+                listenToProjects();
+                listenToTemplates();
+                listenToPortfolios();
+                loadMyPortfolio();
+            } else {
+                currentUserId = null;
+                authContainer.style.display = 'flex';
+                appContainer.style.display = 'none';
+                if (unsubscribeFromProjects) unsubscribeFromProjects();
+                if (unsubscribeFromTemplates) unsubscribeFromTemplates();
+                if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
+                projects = [];
+                projectTemplates = [];
+                renderProjectCards();
+                portfoliosContainer.innerHTML = '';
+            }
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(error => {
+                    loginErrorMsg.textContent = "Email ou senha inválidos.";
+                });
+        });
+
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .catch(error => {
+                    switch (error.code) {
+                        case 'auth/email-already-in-use': signupErrorMsg.textContent = "Este email já está em uso."; break;
+                        case 'auth/invalid-email': signupErrorMsg.textContent = "O formato do email é inválido."; break;
+                        case 'auth/weak-password': signupErrorMsg.textContent = "A senha é muito fraca (mínimo 6 caracteres)."; break;
+                        default: signupErrorMsg.textContent = "Ocorreu um erro ao criar a conta."; break;
+                    }
+                });
+        });
+
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        showSignupBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('signup-section').style.display = 'block';
+        });
+
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('signup-section').style.display = 'none';
+        });
+        
+        // --- FIRESTORE & APP LOGIC ---
+        const getProjectsCollectionPath = () => currentUserId ? `users/${currentUserId}/projects` : null;
+        const getTemplatesCollectionPath = () => currentUserId ? `users/${currentUserId}/templates` : null;
+
+        const listenToProjects = () => {
+            if (unsubscribeFromProjects) unsubscribeFromProjects();
+            const path = getProjectsCollectionPath();
+            if (!path) return;
+            unsubscribeFromProjects = onSnapshot(collection(db, path), (snapshot) => {
+                projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderProjectCards();
+                renderFinancialDashboard();
+                generateAndRenderNotifications();
+            }, (error) => {
+                console.error("Erro ao buscar projetos: ", error);
+                showNotification("Erro ao carregar projetos.", true);
+            });
+        };
+
+        const listenToTemplates = () => {
+            if(unsubscribeFromTemplates) unsubscribeFromTemplates();
+            const path = getTemplatesCollectionPath();
+            if (!path) return;
+            unsubscribeFromTemplates = onSnapshot(collection(db, path), (snapshot) => {
+                projectTemplates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderTemplateOptions();
+            });
+        }
+
+        const listenToPortfolios = () => {
+            if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
+            unsubscribeFromPortfolios = onSnapshot(collection(db, 'portfolios'), (snapshot) => {
+                allPublicPortfolios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                applyFiltersAndRenderPortfolios();
+            }, (error) => {
+                console.error("Erro ao buscar portfólios: ", error);
+                showNotification("Erro ao carregar portfólios.", true);
+            });
+        };
+        
+        const loadMyPortfolio = async () => {
+            if (!currentUserId) return;
+            const docSnap = await getDoc(doc(db, 'portfolios', currentUserId));
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('portfolio-name').value = data.editorName || '';
+                document.getElementById('portfolio-link').value = data.portfolioLink || '';
+                document.getElementById('portfolio-specialties').value = data.specialties || '';
+                document.getElementById('portfolio-price').value = data.priceInfo || '';
+            } else {
+                portfolioForm.reset();
+            }
+        };
+
+        const switchTab = (tabId) => {
+            tabContents.forEach(content => content.classList.remove('active'));
+            sidebarLinks.forEach(button => {
+                button.classList.remove('active', 'bg-blue-600', 'text-white');
+                if (button.dataset.tab === tabId) {
+                    button.classList.add('active', 'bg-blue-600', 'text-white');
+                    pageTitle.textContent = button.title;
+                }
+            });
+            document.getElementById(tabId).classList.add('active');
+        };
+
+        const calculateDaysLeft = (deadline) => {
+            if (!deadline) return { days: Infinity, text: 'Sem prazo', colorClass: 'border-gray-700' };
+            const today = new Date();
+            const deadlineDate = new Date(deadline + 'T23:59:59');
+            today.setHours(0, 0, 0, 0);
+            if (isNaN(deadlineDate.getTime())) return { days: Infinity, text: 'Data inválida', colorClass: 'border-yellow-700' };
+            
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) return { days: diffDays, text: `Atrasado ${Math.abs(diffDays)} dia(s)`, colorClass: 'border-red-500' };
+            if (diffDays === 0) return { days: diffDays, text: 'Entrega hoje!', colorClass: 'border-yellow-400' };
+            if (diffDays <= 3) return { days: diffDays, text: `Falta ${diffDays} dia(s)`, colorClass: 'border-yellow-500' };
+            return { days: diffDays, text: `Faltam ${diffDays} dias`, colorClass: 'border-green-500' };
+        };
+
+        const getStatusIcon = (status) => {
+            switch(status) {
+                case 'Em Andamento': return `<svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                case 'Concluído': return `<svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                default: return `<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            }
+        };
+
+        const renderStatusSelect = (id, field, label, status) => {
+            const selected = (val) => val === status ? 'selected' : '';
+            return `
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center gap-2">
+                        ${getStatusIcon(status)}
+                        <label for="${field}-${id}" class="text-gray-400">${label}</label>
+                    </div>
+                    <select data-id="${id}" data-field="${field}" class="status-select bg-[#0d1117] border border-[#30363d] rounded p-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <option value="Pendente" ${selected('Pendente')}>Pendente</option>
+                        <option value="Em Andamento" ${selected('Em Andamento')}>Em Andamento</option>
+                        <option value="Concluído" ${selected('Concluído')}>Concluído</option>
+                    </select>
+                </div>
+            `;
+        };
+
+        const renderProjectCards = () => {
+            projectCardsContainer.innerHTML = '';
+            if (projects.length === 0) {
+                projectCardsContainer.innerHTML = `<p class="text-center md:col-span-2 xl:col-span-3 2xl:col-span-4">Nenhum projeto adicionado. Vá para "Projetos" para começar.</p>`;
+                return;
+            }
+             // Sort projects by deadline
+            const sortedProjects = [...projects].sort((a, b) => calculateDaysLeft(a.deadline).days - calculateDaysLeft(b.deadline).days);
+
+            sortedProjects.forEach(project => {
+                const deadlineInfo = calculateDaysLeft(project.deadline);
+                const filesHTML = (project.files || []).map(file => `
+                    <li class="text-xs truncate">
+                        <a href="${file.url}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1.5">
+                            <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                            ${file.name}
+                        </a>
+                    </li>`).join('') || '<li class="text-xs text-gray-500">Nenhum ficheiro.</li>';
+
+                const isCompleted = project.progress == 100;
+                const commentsHTML = (project.comments || []).map(comment => `
+                    <div class="text-xs p-2 rounded-md ${comment.author === 'Editor' ? 'bg-blue-900/40 text-right' : 'bg-gray-700/40'}">
+                        <p>${comment.text}</p>
+                        <p class="text-gray-400 text-[10px] mt-1">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
+                    </div>
+                `).join('') || '<li class="text-xs text-gray-500">Nenhum comentário.</li>';
+
+
+                const card = document.createElement('div');
+                card.className = `bg-[#161b22] border border-[#30363d] p-5 rounded-xl shadow-lg flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1 border-l-4 ${deadlineInfo.colorClass}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-white">${project.name}</h3>
+                            <div class="flex items-center gap-2">
+                                <button class="share-project-btn text-gray-500 hover:text-blue-400 transition-colors" data-id="${project.id}" title="Partilhar com Cliente">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                                </button>
+                                <button class="delete-project-btn text-gray-500 hover:text-red-500 transition-colors font-bold text-lg" data-id="${project.id}">&times;</button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-1">Cliente: ${project.client || 'N/A'}</p>
+                        <p class="text-sm text-gray-400 mb-2">Valor: <span class="font-semibold text-green-400">R$ ${parseFloat(project.value || 0).toFixed(2)}</span></p>
+                        <p class="text-sm font-semibold mb-4 px-2 py-1 inline-block rounded-md bg-opacity-20">${deadlineInfo.text}</p>
+                        
+                        <div class="border-t border-[#30363d] pt-3 mt-3 space-y-2.5">
+                            ${renderStatusSelect(project.id, 'storyboardStatus', 'Storyboard', project.storyboardStatus || 'Pendente')}
+                            ${renderStatusSelect(project.id, 'recortesStatus', 'Recortes', project.recortesStatus || 'Pendente')}
+                            ${renderStatusSelect(project.id, 'cameraStatus', 'Câmera', project.cameraStatus || 'Pendente')}
+                            ${renderStatusSelect(project.id, 'ccStatus', 'CC', project.ccStatus || 'Pendente')}
+                        </div>
+                        
+                        <div class="border-t border-[#30363d] pt-3 mt-4">
+                           <label class="text-sm">Comentários</label>
+                           <div class="mt-1 space-y-1.5 max-h-24 overflow-y-auto pr-1">${commentsHTML}</div>
+                        </div>
+
+                        <div class="border-t border-[#30363d] pt-3 mt-4">
+                           <label class="text-sm">Ficheiros</label>
+                           <ul class="mt-1 space-y-1.5">${filesHTML}</ul>
+                           <label class="block w-full text-center mt-2 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md cursor-pointer transition-colors">
+                               Anexar Ficheiro
+                               <input type="file" class="hidden file-upload-input" data-id="${project.id}">
+                           </label>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <label for="progress-${project.id}" class="text-sm font-medium">Progresso: <span id="progress-value-${project.id}" class="font-bold text-white">${project.progress || 0}%</span></label>
+                        <input type="range" id="progress-${project.id}" min="0" max="100" value="${project.progress || 0}" data-id="${project.id}" class="w-full mt-2 progress-slider">
+                        <div class="flex gap-2 mt-4">
+                            <button class="complete-project-btn w-full py-2 text-sm bg-green-600 hover:bg-green-700 font-semibold rounded-lg transition-colors ${isCompleted ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${project.id}" ${isCompleted ? 'disabled' : ''}>Concluir</button>
+                            <button class="save-template-btn w-full py-2 text-sm bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg transition-colors" data-id="${project.id}">Salvar Template</button>
+                        </div>
+                    </div>
+                `;
+                projectCardsContainer.appendChild(card);
+            });
+        };
+
+        const renderFinancialDashboard = () => {
+            const completedProjects = projects.filter(p => p.progress == 100);
+            const potentialProjects = projects.filter(p => p.progress < 100);
+
+            const totalEarned = completedProjects.reduce((sum, p) => sum + parseFloat(p.value || 0), 0);
+            const totalPotential = potentialProjects.reduce((sum, p) => sum + parseFloat(p.value || 0), 0);
+
+            totalEarnedEl.textContent = `R$ ${totalEarned.toFixed(2)}`;
+            totalPotentialEl.textContent = `R$ ${totalPotential.toFixed(2)}`;
+            
+            const monthly = {};
+            completedProjects.forEach(p => {
+                if(p.deadline) {
+                    const month = p.deadline.substring(0, 7); // "YYYY-MM"
+                    if(!monthly[month]) monthly[month] = 0;
+                    monthly[month] += parseFloat(p.value || 0);
+                }
+            });
+
+            const sortedMonths = Object.keys(monthly).sort();
+             if(sortedMonths.length === 0) {
+                 monthlyIncomeDetailsEl.innerHTML = `<p class="text-center">Nenhum projeto concluído ainda.</p>`;
+                 if (monthlyIncomeChart) monthlyIncomeChart.destroy();
+                 return;
+             }
+
+            const chartLabels = sortedMonths.map(month => {
+                const date = new Date(month + '-02');
+                return date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
+            });
+            const chartData = sortedMonths.map(month => monthly[month]);
+
+            const ctx = document.getElementById('monthly-income-chart').getContext('2d');
+            if (monthlyIncomeChart) monthlyIncomeChart.destroy();
+            monthlyIncomeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Ganhos Mensais',
+                        data: chartData,
+                        backgroundColor: 'rgba(47, 129, 247, 0.5)',
+                        borderColor: 'rgba(47, 129, 247, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                        x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            monthlyIncomeDetailsEl.innerHTML = sortedMonths.reverse().map(month => {
+                const date = new Date(month + '-02');
+                const monthName = date.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+                return `<div class="flex justify-between items-center bg-[#0d1117] p-3 rounded-lg">
+                            <span class="capitalize">${monthName}</span>
+                            <span class="font-bold text-green-400">R$ ${monthly[month].toFixed(2)}</span>
+                        </div>`
+            }).join('');
+        };
+
+        const renderTemplateOptions = () => {
+            templateSelect.innerHTML = '<option value="">Nenhum</option>';
+            projectTemplates.forEach(template => {
+                const option = document.createElement('option');
+                option.value = template.id;
+                option.textContent = template.name;
+                templateSelect.appendChild(option);
+            });
+        };
+
+        const applyFiltersAndRenderPortfolios = () => {
+            const searchTerm = searchPortfolioInput.value.toLowerCase().trim();
+            let filteredPortfolios = [...allPublicPortfolios];
+
+            if (activePortfolioFilters.size > 0) {
+                filteredPortfolios = filteredPortfolios.filter(p => {
+                    const specialties = (p.specialties || '').toLowerCase();
+                    for (const filter of activePortfolioFilters) {
+                        if (specialties.includes(filter)) return true;
+                    }
+                    return false;
+                });
+            }
+
+            if (searchTerm) {
+                filteredPortfolios = filteredPortfolios.filter(p =>
+                    (p.editorName || '').toLowerCase().includes(searchTerm) ||
+                    (p.specialties || '').toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderPublicPortfolios(filteredPortfolios);
+        };
+
+        const renderPublicPortfolios = (portfolios) => {
+            portfoliosContainer.innerHTML = '';
+            if (portfolios.length === 0) {
+                portfoliosContainer.innerHTML = `<p class="text-center md:col-span-2">Nenhum portfólio encontrado.</p>`;
+                return;
+            }
+            portfolios.forEach(portfolio => {
+                const card = document.createElement('div');
+                card.className = 'bg-[#161b22] border border-[#30363d] p-5 rounded-xl shadow-lg transition-transform hover:-translate-y-1';
+                card.innerHTML = `
+                    <h3 class="text-xl font-bold text-blue-400">${portfolio.editorName}</h3>
+                    <p class="text-sm mt-2 mb-3">Especialidades: ${portfolio.specialties}</p>
+                    <p class="text-sm mb-4 font-semibold">Preços: ${portfolio.priceInfo}</p>
+                    <a href="${portfolio.portfolioLink}" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Ver Portfólio</a>
+                `;
+                portfoliosContainer.appendChild(card);
+            });
+        };
+        
+        const handleAddProject = async (e) => {
+            e.preventDefault();
+            
+            const proceedWithAddingProject = async () => {
+                const path = getProjectsCollectionPath();
+                if(!path) return showNotification("Erro: Utilizador não autenticado.", true);
+
+                const newProject = {
+                    name: document.getElementById('project-name').value,
+                    client: document.getElementById('client-name').value,
+                    deadline: document.getElementById('deadline').value,
+                    value: document.getElementById('project-value').value,
+                    progress: 0,
+                    storyboardStatus: document.getElementById('storyboard-status').value,
+                    recortesStatus: document.getElementById('recortes-status').value,
+                    cameraStatus: document.getElementById('camera-status').value,
+                    ccStatus: document.getElementById('cc-status').value,
+                    notes: "",
+                    files: [],
+                    comments: [],
+                    public: false
+                };
+                try {
+                    await addDoc(collection(db, path), newProject);
+                    addProjectForm.reset();
+                    templateSelect.value = "";
+                    switchTab('dashboard');
+                    showNotification("Projeto adicionado com sucesso!");
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    showNotification("Erro ao adicionar projeto.", true);
+                }
+            };
+            
+            const projectName = document.getElementById('project-name').value;
+            const projectValue = parseFloat(document.getElementById('project-value').value) || 0;
+
+            if (projectValue <= 1) {
+                showConfirmationModal(
+                    `Tem certeza que deseja adicionar o projeto "${projectName}" com o valor de R$ ${projectValue.toFixed(2)}?`,
+                    proceedWithAddingProject
+                );
+            } else {
+                proceedWithAddingProject();
+            }
+        };
+
+        const handleSavePortfolio = async (e) => {
+            e.preventDefault();
+            if (!currentUserId) return showNotification("Você precisa estar logado.", true);
+
+            const portfolioData = {
+                userId: currentUserId,
+                editorName: document.getElementById('portfolio-name').value,
+                portfolioLink: document.getElementById('portfolio-link').value,
+                specialties: document.getElementById('portfolio-specialties').value,
+                priceInfo: document.getElementById('portfolio-price').value,
+                updatedAt: new Date(),
+            };
+
+            try {
+                await setDoc(doc(db, "portfolios", currentUserId), portfolioData);
+                showNotification("Portfólio salvo com sucesso!");
+            } catch (error) {
+                console.error("Error saving portfolio: ", error);
+                showNotification("Erro ao salvar o portfólio.", true);
+            }
+        };
+
+        const handleDeletePortfolio = async () => {
+            if (!currentUserId) return;
+            showConfirmationModal("Tem certeza que deseja remover seu portfólio público?", async () => {
+                try {
+                    await deleteDoc(doc(db, "portfolios", currentUserId));
+                    showNotification("Portfólio removido com sucesso!");
+                    portfolioForm.reset();
+                } catch (error) {
+                    console.error("Error deleting portfolio: ", error);
+                    showNotification("Erro ao remover o portfólio.", true);
+                }
+            });
+        };
+        
+        const handleProjectInteraction = async (e) => {
+            const target = e.target;
+            const button = target.closest('button');
+            const projectId = target.dataset.id || button?.dataset.id || target.closest('[data-id]')?.dataset.id;
+
+            if (!projectId) return;
+
+            const path = getProjectsCollectionPath();
+            if (!path) return;
+
+            const projectDocRef = doc(db, path, projectId);
+
+             if (button && button.classList.contains('share-project-btn')) {
+                try {
+                    await updateDoc(projectDocRef, { public: true });
+                    const url = `${window.location.origin}${window.location.pathname}?mode=client&userId=${currentUserId}&projectId=${projectId}`;
+                    
+                    // Simple clipboard copy
+                    const dummy = document.createElement('textarea');
+                    document.body.appendChild(dummy);
+                    dummy.value = url;
+                    dummy.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(dummy);
+
+                    showNotification("Link do portal do cliente copiado!");
+                } catch (error) {
+                    console.error("Error sharing project:", error);
+                    showNotification("Erro ao partilhar o projeto.", true);
+                }
+            }
+
+
+            if (target.classList.contains('progress-slider')) {
+                const newProgress = target.value;
+                document.getElementById(`progress-value-${projectId}`).textContent = `${newProgress}%`;
+                try {
+                    await updateDoc(projectDocRef, { progress: Number(newProgress) });
+                } catch (error) { console.error("Error updating progress: ", error); }
+            }
+            
+            if (button && button.classList.contains('complete-project-btn')) {
+                showConfirmationModal("Marcar este projeto como concluído?", async () => {
+                    try {
+                        await updateDoc(projectDocRef, {
+                            progress: 100, storyboardStatus: 'Concluído', recortesStatus: 'Concluído',
+                            cameraStatus: 'Concluído', ccStatus: 'Concluído'
+                        });
+                        showNotification("Projeto concluído!");
+                    } catch (error) { showNotification("Erro ao concluir o projeto.", true); }
+                });
+            }
+
+             if (button && button.classList.contains('save-template-btn')) {
+                const projectToSave = projects.find(p => p.id === projectId);
+                if (projectToSave) {
+                    const templateName = prompt("Qual o nome para este template?", projectToSave.name);
+                    if (templateName) {
+                        const templateData = { ...projectToSave };
+                        delete templateData.id; delete templateData.deadline; delete templateData.client;
+                        delete templateData.notes; delete templateData.files; delete templateData.comments;
+                        templateData.name = templateName;
+                        try {
+                            await addDoc(collection(db, getTemplatesCollectionPath()), templateData);
+                            showNotification("Template salvo com sucesso!");
+                        } catch(err) {
+                            showNotification("Erro ao salvar o template.", true);
+                        }
+                    }
+                }
+            }
+
+            if (button && button.classList.contains('delete-project-btn')) {
+                showConfirmationModal("Tem certeza que deseja remover este projeto?", async () => {
+                    try {
+                        await deleteDoc(projectDocRef);
+                        showNotification("Projeto removido.");
+                    } catch (error) { showNotification("Erro ao remover projeto.", true); }
+                });
+            }
+            
+            if (target.classList.contains('status-select')) {
+                const field = target.dataset.field;
+                const newValue = target.value;
+                try {
+                    await updateDoc(projectDocRef, { [field]: newValue });
+                } catch (error) { console.error(`Error updating ${field}: `, error); }
+            }
+
+            if (target.classList.contains('notes-textarea')) {
+                clearTimeout(noteUpdateTimeout);
+                noteUpdateTimeout = setTimeout(async () => {
+                    try {
+                        await updateDoc(projectDocRef, { notes: target.value });
+                    } catch (error) { console.error(`Error updating notes: `, error); }
+                }, 500); // Debounce update
+            }
+
+            if (target.classList.contains('file-upload-input')) {
+                const file = target.files[0];
+                if (!file) return;
+
+                const storageRef = ref(storage, `users/${currentUserId}/projects/${projectId}/${file.name}`);
+                target.disabled = true;
+                showNotification("A enviar ficheiro...");
+
+                try {
+                    const snapshot = await uploadBytes(storageRef, file);
+                    const downloadURL = await getDownloadURL(snapshot.ref);
+                    await updateDoc(projectDocRef, {
+                        files: arrayUnion({ name: file.name, url: downloadURL })
+                    });
+                    showNotification("Ficheiro enviado com sucesso!");
+                } catch (error) {
+                    showNotification("Erro ao enviar ficheiro.", true);
+                } finally {
+                    target.disabled = false;
+                }
+            }
+        };
+
+        const handlePortfolioFilterClick = (e) => {
+            if (e.target.tagName !== 'BUTTON') return;
+            const filter = e.target.dataset.filter.toLowerCase();
+            e.target.classList.toggle('active');
+            e.target.classList.toggle('bg-blue-600');
+            e.target.classList.toggle('text-white');
+            activePortfolioFilters.has(filter) ? activePortfolioFilters.delete(filter) : activePortfolioFilters.add(filter);
+            applyFiltersAndRenderPortfolios();
+        };
+        
+        const handleCalculatePrice = () => {
+            const pricePerMinute = parseFloat(document.getElementById('calc-price-per-minute').value) || 0;
+            const minutes = parseInt(document.getElementById('calc-minutes').value) || 0;
+            const seconds = parseInt(document.getElementById('calc-seconds').value) || 0;
+            const resultDiv = document.getElementById('price-result');
+            if (pricePerMinute <= 0 || (minutes <= 0 && seconds <= 0)) {
+                resultDiv.innerHTML = `<p class="text-yellow-400">Preencha o preço e o tempo.</p>`;
+                return;
+            }
+            const finalPrice = (pricePerMinute / 60) * ((minutes * 60) + seconds);
+            resultDiv.innerHTML = `<p class="text-lg">Preço total: <span class="font-bold text-2xl text-green-400">R$ ${finalPrice.toFixed(2)}</span></p>`;
+        };
+
+        const handleCalculateDiscount = () => {
+            const originalValue = parseFloat(document.getElementById('calc-original-value').value) || 0;
+            const delayDays = parseInt(document.getElementById('calc-delay').value) || 0;
+            const discountPercent = parseFloat(document.getElementById('calc-discount-percent').value) || 0;
+            const resultDiv = document.getElementById('discount-result');
+            if(originalValue <= 0 || delayDays <= 0 || discountPercent <= 0) {
+                resultDiv.innerHTML = `<p class="text-yellow-400">Preencha todos os campos.</p>`;
+                return;
+            }
+            const totalDiscountPercent = delayDays * discountPercent;
+            const discountValue = originalValue * (totalDiscountPercent / 100);
+            const finalValue = originalValue - discountValue;
+            resultDiv.innerHTML = `<p>Desconto: <span class="font-bold">${totalDiscountPercent.toFixed(2)}% (R$ ${discountValue.toFixed(2)})</span></p><p class="text-lg mt-2">Valor final: <span class="font-bold text-2xl text-green-400">R$ ${finalValue.toFixed(2)}</span></p>`;
+        };
+        
+        const generateAndRenderNotifications = () => {
+            const notifications = [];
+            projects.forEach(p => {
+                const deadlineInfo = calculateDaysLeft(p.deadline);
+                if (deadlineInfo.days <= 3 && deadlineInfo.days >= 0) {
+                    notifications.push({ message: `Prazo para "${p.name}" a terminar!` });
+                } else if (deadlineInfo.days < 0) {
+                    notifications.push({ message: `Projeto "${p.name}" está atrasado!`, isUrgent: true });
+                }
+            });
+
+            notificationBadge.style.display = notifications.length > 0 ? 'flex' : 'none';
+            notificationBadge.textContent = notifications.length;
+
+            notificationsPanel.innerHTML = notifications.length > 0
+                ? notifications.map(n => `<div class="p-2 border-b border-[#30363d] text-sm ${n.isUrgent ? 'text-red-400' : ''}">${n.message}</div>`).join('')
+                : '<div class="p-2 text-sm">Nenhuma notificação.</div>';
+        };
+
+        // --- CLIENT PORTAL LOGIC ---
+        const loadClientPortal = (userId, projectId) => {
+            const projectDocRef = doc(db, `users/${userId}/projects`, projectId);
+
+            onSnapshot(projectDocRef, (doc) => {
+                if (!doc.exists()) {
+                    clientPortalContainer.innerHTML = `<h1 class="text-2xl text-red-500">Projeto não encontrado ou acesso negado.</h1>`;
+                    return;
+                }
+                const project = doc.data();
+
+                const filesHTML = (project.files || []).map(file => `
+                    <a href="${file.url}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-2 bg-[#161b22] p-3 rounded-lg">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                        ${file.name}
+                    </a>`).join('') || '<p class="text-gray-400">Nenhum ficheiro disponível.</p>';
+                
+                const commentsHTML = (project.comments || []).map(comment => `
+                     <div class="p-3 rounded-lg ${comment.author === 'Editor' ? 'bg-blue-900/40 ml-auto' : 'bg-gray-700/40 mr-auto'}" style="max-width: 80%;">
+                         <p class="text-sm">${comment.text}</p>
+                         <p class="text-gray-400 text-[11px] mt-1 text-right">${new Date(comment.timestamp.toDate()).toLocaleString('pt-BR')}</p>
+                     </div>
+                `).join('');
+
+                clientPortalContainer.innerHTML = `
+                    <div class="max-w-4xl mx-auto">
+                        <header class="text-center mb-10">
+                            <h1 class="text-4xl font-bold text-blue-500">Shibuya Hub</h1>
+                            <p class="text-gray-400 mt-2">Portal de Acompanhamento do Cliente</p>
+                        </header>
+                        <div class="bg-[#161b22] border border-[#30363d] rounded-xl p-6 md:p-8">
+                            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">${project.name}</h2>
+                            <p class="text-gray-400 mb-6">Cliente: ${project.client || 'N/A'}</p>
+
+                            <div class="mb-6">
+                                <label class="text-sm font-medium">Progresso Geral</label>
+                                <div class="w-full bg-[#30363d] rounded-full h-4 mt-2">
+                                    <div class="bg-blue-600 h-4 rounded-full" style="width: ${project.progress || 0}%"></div>
+                                </div>
+                                <p class="text-right font-bold text-lg mt-1">${project.progress || 0}%</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                                <div class="flex items-center gap-3 p-3 bg-[#0d1117] rounded-lg">${getStatusIcon(project.storyboardStatus)} Storyboard: <span class="font-semibold ml-auto">${project.storyboardStatus}</span></div>
+                                <div class="flex items-center gap-3 p-3 bg-[#0d1117] rounded-lg">${getStatusIcon(project.recortesStatus)} Recortes: <span class="font-semibold ml-auto">${project.recortesStatus}</span></div>
+                                <div class="flex items-center gap-3 p-3 bg-[#0d1117] rounded-lg">${getStatusIcon(project.cameraStatus)} Câmera: <span class="font-semibold ml-auto">${project.cameraStatus}</span></div>
+                                <div class="flex items-center gap-3 p-3 bg-[#0d1117] rounded-lg">${getStatusIcon(project.ccStatus)} Color Correction: <span class="font-semibold ml-auto">${project.ccStatus}</span></div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <h3 class="text-xl font-bold mb-4 text-white">Ficheiros para Download</h3>
+                                    <div class="space-y-3">${filesHTML}</div>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-4 text-white">Feedback e Comentários</h3>
+                                    <div id="comments-box" class="space-y-3 p-3 bg-[#0d1117] rounded-lg h-48 overflow-y-auto mb-4">${commentsHTML}</div>
+                                    <form id="comment-form">
+                                        <textarea id="comment-input" class="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-lg resize-none" placeholder="Deixe um comentário..." required></textarea>
+                                        <button type="submit" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg">Enviar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                         <footer class="text-center py-6 mt-4 text-sm text-gray-500">
+                             <p>FEITO POR @LUCXSEDIITS</p>
+                         </footer>
+                    </div>
+                `;
+                
+                const commentsBox = document.getElementById('comments-box');
+                if (commentsBox) commentsBox.scrollTop = commentsBox.scrollHeight;
+
+
+                document.getElementById('comment-form')?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('comment-input');
+                    const text = input.value.trim();
+                    if (text) {
+                        const newComment = {
+                            text,
+                            author: 'Cliente',
+                            timestamp: new Date()
+                        };
+                        try {
+                            await updateDoc(projectDocRef, { comments: arrayUnion(newComment) });
+                            input.value = '';
+                        } catch (err) {
+                            console.error("Error adding comment: ", err);
+                            alert("Não foi possível enviar o seu comentário.");
+                        }
+                    }
+                });
+
+            });
+        };
+        
+        // --- EVENT LISTENERS ---
+        sidebarLinks.forEach(button => {
+            button.addEventListener('click', () => switchTab(button.dataset.tab));
+        });
+        homeBtn.addEventListener('click', () => switchTab('dashboard'));
+        addProjectForm.addEventListener('submit', handleAddProject);
+        portfolioForm.addEventListener('submit', handleSavePortfolio);
+        deletePortfolioBtn.addEventListener('click', handleDeletePortfolio);
+        projectCardsContainer.addEventListener('input', handleProjectInteraction);
+        projectCardsContainer.addEventListener('change', handleProjectInteraction);
+        projectCardsContainer.addEventListener('click', handleProjectInteraction);
+        calculatePriceBtn.addEventListener('click', handleCalculatePrice);
+        calculateDiscountBtn.addEventListener('click', handleCalculateDiscount);
+        searchPortfolioInput.addEventListener('input', applyFiltersAndRenderPortfolios);
+        portfolioFilters.addEventListener('click', handlePortfolioFilterClick);
+        notificationsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationsPanel.style.display = notificationsPanel.style.display === 'block' ? 'none' : 'block';
+        });
+        templateSelect.addEventListener('change', (e) => {
+            const templateId = e.target.value;
+            if (templateId) {
+                const template = projectTemplates.find(t => t.id === templateId);
+                if (template) {
+                    document.getElementById('project-name').value = template.name;
+                    document.getElementById('project-value').value = template.value;
+                    document.getElementById('storyboard-status').value = template.storyboardStatus;
+                    document.getElementById('recortes-status').value = template.recortesStatus;
+                    document.getElementById('camera-status').value = template.cameraStatus;
+                    document.getElementById('cc-status').value = template.ccStatus;
+                }
+            } else {
+                addProjectForm.reset();
+            }
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!notificationsBtn.contains(e.target) && !notificationsPanel.contains(e.target)) {
+                 notificationsPanel.style.display = 'none';
+            }
+        });
+
+        // --- INITIAL LOAD ---
+        switchTab('dashboard'); // Set initial tab
+
+    </script>
+</body>
+</html>
