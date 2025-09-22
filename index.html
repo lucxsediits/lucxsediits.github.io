@@ -73,6 +73,15 @@
             margin-right: auto;
             border-bottom-left-radius: 4px;
         }
+
+        /* Animação para o modo de organização */
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(47, 129, 247, 0.7); }
+            50% { box-shadow: 0 0 0 4px rgba(47, 129, 247, 0); }
+        }
+        .reorder-active .cursor-grab {
+            animation: pulse-border 2s infinite;
+        }
     </style>
 </head>
 <body class="bg-[#0d1117] text-[#c9d1d9]">
@@ -189,7 +198,12 @@
         
         <main class="flex-1 overflow-y-auto p-6 lg:p-10">
             <header class="flex justify-between items-center mb-8">
-                <h1 id="page-title" class="text-3xl font-bold text-white">Visão Geral</h1>
+                <div class="flex items-center gap-4">
+                    <h1 id="page-title" class="text-3xl font-bold text-white">Visão Geral</h1>
+                    <button id="toggle-reorder-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">
+                        Organizar Ordem
+                    </button>
+                </div>
                 <div class="relative">
                     <button id="notifications-btn" class="text-gray-400 hover:text-white transition-colors relative">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
@@ -202,7 +216,8 @@
             <div>
                 <div id="dashboard" class="tab-content active">
                     <div id="project-cards-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-                        </div>
+                        <!-- Os cards de projeto serão inseridos aqui via JS -->
+                    </div>
                 </div>
                 <div id="projects" class="tab-content space-y-10">
                     <div class="bg-[#161b22] border border-[#30363d] p-8 rounded-xl max-w-3xl mx-auto shadow-lg">
@@ -269,12 +284,12 @@
                         </div>
 
                         <div id="inprogress-projects-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-                            </div>
+                        </div>
 
                         <div id="completed-projects-section" class="mt-12" style="display: none;">
                             <h2 class="text-2xl font-bold mb-4 text-white">Projetos Concluídos</h2>
                             <div id="completed-projects-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -306,7 +321,7 @@
                                 <button class="filter-btn text-sm border border-[#30363d] py-1 px-3 rounded-full hover:bg-[#30363d] transition-colors" data-filter="Lyric">Lyric</button>
                             </div>
                             <div id="portfolios-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -432,7 +447,7 @@
                     <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                         <h3 class="text-xl font-bold mb-4">Posts da Comunidade</h3>
                         <div id="community-resources-container" class="space-y-4">
-                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="tutorial" class="tab-content">
@@ -481,7 +496,7 @@
                                 <li><strong>Gráfico de Ganhos Mensais:</strong> O gráfico de barras mostra seus ganhos mensais com base na data de entrega dos projetos concluídos, ajudando você a visualizar sua performance ao longo do tempo.</li>
                             </ul>
                         </div>
-                            
+                                
                         <!-- NEW: Resources Tab -->
                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                             <h3 class="text-xl font-bold text-blue-400 mb-3">Aba de Comunidade</h3>
@@ -491,7 +506,7 @@
                                 <li><strong>Compartilhar Conhecimento:</strong> Use o formulário abaixo para enviar um link de um tutorial ou recurso que você achou útil. A comunidade agradece!</li>
                             </ul>
                         </div>
-                            
+                                
                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                             <h3 class="text-xl font-bold text-blue-400 mb-3">Aba Calculadora</h3>
                             <p class="mb-2">Ferramentas úteis para o dia a dia.</p>
@@ -500,7 +515,7 @@
                                 <li><strong>Calculadora de Desconto por Atraso:</strong> Se você tem uma política de descontos por atraso na entrega, esta calculadora ajuda a determinar o valor final, aplicando uma porcentagem de desconto por cada dia de atraso.</li>
                             </ul>
                         </div>
-                            
+                                
                         <div class="bg-[#161b22] border border-[#30363d] p-6 rounded-xl">
                             <h3 class="text-xl font-bold text-blue-400 mb-3">Portal do Cliente</h3>
                             <p class="mb-2">Compartilhe o progresso com seus clientes de forma profissional.</p>
@@ -537,7 +552,7 @@
     </div>
     
     <div id="client-portal-container" class="min-h-screen p-4 md:p-8">
-        </div>
+    </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -590,6 +605,7 @@
         let currentEditProjectId = null;
         let activePortfolioFilters = new Set();
         let activeCommunityFilters = new Set();
+        let isReorderModeActive = false; // NOVA VARIÁVEL DE ESTADO
         
         // --- DOM ELEMENTS ---
         const notification = document.getElementById('notification');
@@ -662,6 +678,7 @@
         const requestPending = document.getElementById('request-pending');
         const requestReceived = document.getElementById('request-received');
         const acceptChatBtn = document.getElementById('accept-chat-btn');
+        const toggleReorderBtn = document.getElementById('toggle-reorder-btn'); // NOVO SELETOR
         let currentConversationId = null;
 
         // --- PAGE LOAD ROUTING ---
@@ -742,109 +759,110 @@
 
         modalCancelBtn.addEventListener('click', hideConfirmationModal);
 
-       // --- AUTHENTICATION ---
-onAuthStateChanged(auth, async (user) => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('mode') === 'client') return;
+        // --- AUTHENTICATION ---
+        onAuthStateChanged(auth, async (user) => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('mode') === 'client') return;
 
-    if (user) {
-        localStorage.setItem('lastUserEmail', user.email);
-        currentUserId = user.uid;
-        userEmailSpan.textContent = user.email;
-        authContainer.style.display = 'none';
-        appContainer.style.display = 'flex';
+            if (user) {
+                localStorage.setItem('lastUserEmail', user.email);
+                currentUserId = user.uid;
+                userEmailSpan.textContent = user.email;
+                authContainer.style.display = 'none';
+                appContainer.style.display = 'flex';
+                switchTab('dashboard'); // CORREÇÃO AQUI
 
-        listenToUserProfile(user);
-        listenToProjects();
-        listenToTemplates();
-        listenToPortfolios();
-        listenToResources();
-        listenToReminders();
-        listenToUsers();
-        listenToConversations();
-        loadMyPortfolio();
-        
-        if (timeUpdateInterval) clearInterval(timeUpdateInterval);
-        timeUpdateInterval = setInterval(() => {
-            renderDashboardCards();
-            renderProjectLists();
-            generateAndRenderNotifications();
-        }, 60000);
+                listenToUserProfile(user);
+                listenToProjects();
+                listenToTemplates();
+                listenToPortfolios();
+                listenToResources();
+                listenToReminders();
+                listenToUsers();
+                listenToConversations();
+                loadMyPortfolio();
+                
+                if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+                timeUpdateInterval = setInterval(() => {
+                    renderDashboardCards();
+                    renderProjectLists();
+                    generateAndRenderNotifications();
+                }, 60000);
 
-    } else {
-        currentUserId = null;
-        authContainer.style.display = 'flex';
-        appContainer.style.display = 'none';
+            } else {
+                currentUserId = null;
+                authContainer.style.display = 'flex';
+                appContainer.style.display = 'none';
 
-        if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+                if (timeUpdateInterval) clearInterval(timeUpdateInterval);
 
-        if (unsubscribeFromProjects) unsubscribeFromProjects();
-        if (unsubscribeFromTemplates) unsubscribeFromTemplates();
-        if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
-        if (unsubscribeFromResources) unsubscribeFromResources();
-        if (unsubscribeFromReminders) unsubscribeFromReminders();
-        if (unsubscribeFromUsers) unsubscribeFromUsers();
-        if (unsubscribeFromConversations) unsubscribeFromConversations();
-        if (unsubscribeFromCurrentChat) unsubscribeFromCurrentChat();
-        if (unsubscribeFromProfile) unsubscribeFromProfile();
-        projects = [];
-        projectTemplates = [];
-        allCommunityResources = [];
-        reminders = [];
-        activeConversations = [];
-        allUsers = [];
-        renderDashboardCards();
-        renderProjectLists();
-        portfoliosContainer.innerHTML = '';
-    }
-});
-
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    signInWithEmailAndPassword(auth, email, password)
-        .catch(error => {
-            loginErrorMsg.textContent = "Email ou senha inválidos.";
+                if (unsubscribeFromProjects) unsubscribeFromProjects();
+                if (unsubscribeFromTemplates) unsubscribeFromTemplates();
+                if (unsubscribeFromPortfolios) unsubscribeFromPortfolios();
+                if (unsubscribeFromResources) unsubscribeFromResources();
+                if (unsubscribeFromReminders) unsubscribeFromReminders();
+                if (unsubscribeFromUsers) unsubscribeFromUsers();
+                if (unsubscribeFromConversations) unsubscribeFromConversations();
+                if (unsubscribeFromCurrentChat) unsubscribeFromCurrentChat();
+                if (unsubscribeFromProfile) unsubscribeFromProfile();
+                projects = [];
+                projectTemplates = [];
+                allCommunityResources = [];
+                reminders = [];
+                activeConversations = [];
+                allUsers = [];
+                renderDashboardCards();
+                renderProjectLists();
+                portfoliosContainer.innerHTML = '';
+            }
         });
-});
 
-signupForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
-
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
-            email: email,
-            username: email.split('@')[0],
-            createdAt: serverTimestamp(),
-            deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(error => {
+                    loginErrorMsg.textContent = "Email ou senha inválidos.";
+                });
         });
-    } catch (error) {
-        switch (error.code) {
-            case 'auth/email-already-in-use': signupErrorMsg.textContent = "Este email já está em uso."; break;
-            case 'auth/invalid-email': signupErrorMsg.textContent = "O formato do email é inválido."; break;
-            case 'auth/weak-password': signupErrorMsg.textContent = "A senha é muito fraca (mínimo 6 caracteres)."; break;
-            default: signupErrorMsg.textContent = "Ocorreu um erro ao criar a conta."; break;
-        }
-    }
-});
 
-logoutBtn.addEventListener('click', () => signOut(auth));
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
 
-showSignupBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('signup-section').style.display = 'block';
-});
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, 'users', userCredential.user.uid), {
+                    email: email,
+                    username: email.split('@')[0],
+                    createdAt: serverTimestamp(),
+                    deadlineColors: { ok: '#22c55e', warning: '#facc15', danger: '#ef4444' }
+                });
+            } catch (error) {
+                switch (error.code) {
+                    case 'auth/email-already-in-use': signupErrorMsg.textContent = "Este email já está em uso."; break;
+                    case 'auth/invalid-email': signupErrorMsg.textContent = "O formato do email é inválido."; break;
+                    case 'auth/weak-password': signupErrorMsg.textContent = "A senha é muito fraca (mínimo 6 caracteres)."; break;
+                    default: signupErrorMsg.textContent = "Ocorreu um erro ao criar a conta."; break;
+                }
+            }
+        });
 
-showLoginBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('login-section').style.display = 'block';
-    document.getElementById('signup-section').style.display = 'none';
-});
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        showSignupBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('signup-section').style.display = 'block';
+        });
+
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('signup-section').style.display = 'none';
+        });
         
         // --- PROFILE SYSTEM ---
         const listenToUserProfile = (user) => {
@@ -867,7 +885,6 @@ showLoginBtn.addEventListener('click', (e) => {
                 }
                 renderProfileUI();
                 applyCustomColors();
-                pageTitle.textContent = 'Olá, ' + (currentUserProfile.username || 'Usuário');
             });
         };
 
@@ -1027,7 +1044,7 @@ showLoginBtn.addEventListener('click', (e) => {
                 const otherUsername = otherUser ? otherUser.username : 'Usuário Desconhecido';
                 const status = conv.status || 'accepted';
                 const statusText = status === 'pending' && conv.requesterId === currentUserId ? 'Enviado' :
-                                       status === 'pending' && conv.requesterId !== currentUserId ? 'Solicitação' : '';
+                                   status === 'pending' && conv.requesterId !== currentUserId ? 'Solicitação' : '';
 
                 const item = document.createElement('button');
                 item.className = 'w-full text-left p-3 rounded-lg hover:bg-[#30363d] conversation-item';
@@ -1188,6 +1205,16 @@ showLoginBtn.addEventListener('click', (e) => {
                 }
             });
             document.getElementById(tabId).classList.add('active');
+
+            if (tabId === 'dashboard') {
+                toggleReorderBtn.classList.remove('hidden');
+            } else {
+                toggleReorderBtn.classList.add('hidden');
+                if (isReorderModeActive) {
+                    toggleReorderMode(); 
+                }
+            }
+            
             if (tabId === 'agenda') {
                 renderCalendar();
             }
@@ -1248,12 +1275,12 @@ showLoginBtn.addEventListener('click', (e) => {
         const renderCards = (container, projectList, sortable = false) => {
             container.innerHTML = '';
             if (projectList.length === 0) {
-                container.innerHTML = `<p class="text-center md:col-span-2 xl:col-span-3 2xl:col-span-4 text-gray-500">Nenhum projeto encontrado.</p>`;
+                container.innerHTML = `<p class="text-center md:col-span-2 xl:grid-cols-3 2xl:grid-cols-4 text-gray-500">Nenhum projeto encontrado.</p>`;
                 return;
             }
             
             const sortedProjects = [...projectList].sort((a, b) => {
-                if (a.order !== undefined && b.order !== undefined) {
+                if (isReorderModeActive && a.order !== undefined && b.order !== undefined) {
                     return a.order - b.order;
                 }
                 const aDays = calculateDaysLeft(a.deadline).days;
@@ -1289,10 +1316,16 @@ showLoginBtn.addEventListener('click', (e) => {
 
                 const card = document.createElement('div');
                 card.id = `project-card-${project.id}`;
-                card.draggable = sortable;
+                card.draggable = sortable && isReorderModeActive;
                 card.dataset.id = project.id;
                 card.dataset.order = project.order;
-                card.classList.add('bg-[#161b22]', 'border', 'border-[#30363d]', 'p-5', 'rounded-xl', 'shadow-lg', 'flex', 'flex-col', 'justify-between', 'transition-transform', 'duration-200', 'hover:-translate-y-1', 'border-l-4', finalBorderClass, 'cursor-grab', 'active:cursor-grabbing');
+                
+                const baseClasses = ['bg-[#161b22]', 'border', 'border-[#30363d]', 'p-5', 'rounded-xl', 'shadow-lg', 'flex', 'flex-col', 'justify-between', 'transition-transform', 'duration-200', 'hover:-translate-y-1', 'border-l-4', finalBorderClass];
+                card.classList.add(...baseClasses);
+
+                if (sortable && isReorderModeActive) {
+                    card.classList.add('cursor-grab', 'active:cursor-grabbing');
+                }
                 
                 card.innerHTML = `
                     <div>
@@ -1344,7 +1377,7 @@ showLoginBtn.addEventListener('click', (e) => {
                 `;
                 container.appendChild(card);
             });
-            if (sortable) {
+            if (sortable && isReorderModeActive) {
                 makeSortable(container);
             }
         };
@@ -1550,9 +1583,9 @@ showLoginBtn.addEventListener('click', (e) => {
                 const date = new Date(month + '-02');
                 const monthName = date.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
                 return `<div class="flex justify-between items-center bg-[#0d1117] p-3 rounded-lg">
-                             <span class="capitalize">${monthName}</span>
-                             <span class="font-bold text-green-400">R$ ${monthly[month].toFixed(2)}</span>
-                         </div>`
+                            <span class="capitalize">${monthName}</span>
+                            <span class="font-bold text-green-400">R$ ${monthly[month].toFixed(2)}</span>
+                        </div>`
             }).join('');
         };
 
@@ -1706,29 +1739,29 @@ showLoginBtn.addEventListener('click', (e) => {
                         }
                     );
                 } else {
-                     try {
-                         const fullNewProject = {
-                             ...newProjectData,
-                             progress: 0,
-                             storyboardStatus: document.getElementById('storyboard-status').value,
-                             recortesStatus: document.getElementById('recortes-status').value,
-                             cameraStatus: document.getElementById('camera-status').value,
-                             ccStatus: document.getElementById('cc-status').value,
-                             notes: "",
-                             files: [],
-                             comments: [],
-                             public: false,
-                             order: projects.length
-                         };
-                         await addDoc(collection(db, path), fullNewProject);
-                         addProjectForm.reset();
-                         templateSelect.value = "";
-                         switchTab('dashboard');
-                         showNotification("Projeto adicionado com sucesso!");
-                     } catch (error) {
-                         console.error("Error adding document: ", error);
-                         showNotification("Erro ao adicionar projeto.", true);
-                     }
+                       try {
+                           const fullNewProject = {
+                               ...newProjectData,
+                               progress: 0,
+                               storyboardStatus: document.getElementById('storyboard-status').value,
+                               recortesStatus: document.getElementById('recortes-status').value,
+                               cameraStatus: document.getElementById('camera-status').value,
+                               ccStatus: document.getElementById('cc-status').value,
+                               notes: "",
+                               files: [],
+                               comments: [],
+                               public: false,
+                               order: projects.length
+                           };
+                           await addDoc(collection(db, path), fullNewProject);
+                           addProjectForm.reset();
+                           templateSelect.value = "";
+                           switchTab('dashboard');
+                           showNotification("Projeto adicionado com sucesso!");
+                       } catch (error) {
+                           console.error("Error adding document: ", error);
+                           showNotification("Erro ao adicionar projeto.", true);
+                       }
                 }
             } else {
                 try {
@@ -2029,6 +2062,25 @@ showLoginBtn.addEventListener('click', (e) => {
                 showNotification("Erro ao enviar post.", true);
             }
         };
+
+        const toggleReorderMode = () => {
+            isReorderModeActive = !isReorderModeActive;
+
+            if (isReorderModeActive) {
+                toggleReorderBtn.textContent = 'Salvar Ordem';
+                toggleReorderBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                toggleReorderBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                projectCardsContainer.classList.add('reorder-active');
+                showNotification("Modo de organização ativado. Arraste os cards para reordenar.");
+            } else {
+                toggleReorderBtn.textContent = 'Organizar Ordem';
+                toggleReorderBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                toggleReorderBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                projectCardsContainer.classList.remove('reorder-active');
+                showNotification("Ordem salva e modo de organização desativado.");
+            }
+            renderDashboardCards();
+        };
         
         const generateAndRenderNotifications = () => {
             const notifications = [];
@@ -2231,8 +2283,8 @@ showLoginBtn.addEventListener('click', (e) => {
                     const feedback = document.getElementById('client-feedback-input').value;
                     const updateData = { [`${stage}Status`]: 'Concluído' };
                     if (feedback) {
-                         const newComment = { text: feedback, author: 'Cliente', timestamp: new Date() };
-                         updateData.comments = arrayUnion(newComment);
+                        const newComment = { text: feedback, author: 'Cliente', timestamp: new Date() };
+                        updateData.comments = arrayUnion(newComment);
                     }
                     try {
                         await updateDoc(projectDocRef, updateData);
@@ -2244,22 +2296,22 @@ showLoginBtn.addEventListener('click', (e) => {
                 });
 
                 document.getElementById('reject-btn')?.addEventListener('click', async () => {
-                     const stage = document.getElementById('client-approval-form').dataset.stage;
-                     const feedback = document.getElementById('client-feedback-input').value;
-                     if (!feedback) {
-                          showNotification("Por favor, adicione um feedback para rejeitar a etapa.", true);
-                          return;
-                     }
-                     const updateData = { [`${stage}Status`]: 'Pendente' };
-                     const newComment = { text: feedback, author: 'Cliente', timestamp: new Date() };
-                     updateData.comments = arrayUnion(newComment);
-                     try {
+                      const stage = document.getElementById('client-approval-form').dataset.stage;
+                      const feedback = document.getElementById('client-feedback-input').value;
+                      if (!feedback) {
+                           showNotification("Por favor, adicione um feedback para rejeitar a etapa.", true);
+                           return;
+                      }
+                      const updateData = { [`${stage}Status`]: 'Pendente' };
+                      const newComment = { text: feedback, author: 'Cliente', timestamp: new Date() };
+                      updateData.comments = arrayUnion(newComment);
+                      try {
                           await updateDoc(projectDocRef, updateData);
                           showNotification("Etapa rejeitada. Feedback enviado.");
-                     } catch (err) {
+                      } catch (err) {
                           console.error("Erro ao rejeitar etapa: ", err);
                           showNotification("Erro ao rejeitar etapa.", true);
-                     }
+                      }
                 });
             });
         };
@@ -2309,13 +2361,13 @@ showLoginBtn.addEventListener('click', (e) => {
              }
 
              if (e.target.closest('.conversation-item')) {
-                  const convId = e.target.closest('.conversation-item').dataset.id;
-                  const otherUserId = e.target.closest('.conversation-item').dataset.otherUserId;
-                  const otherUsername = e.target.closest('.conversation-item').dataset.otherUsername;
-                  const conversation = activeConversations.find(c => c.id === convId);
-                  if (conversation) {
-                      renderChatArea(convId, { id: otherUserId, username: otherUsername }, conversation.status);
-                  }
+                 const convId = e.target.closest('.conversation-item').dataset.id;
+                 const otherUserId = e.target.closest('.conversation-item').dataset.otherUserId;
+                 const otherUsername = e.target.closest('.conversation-item').dataset.otherUsername;
+                 const conversation = activeConversations.find(c => c.id === convId);
+                 if (conversation) {
+                     renderChatArea(convId, { id: otherUserId, username: otherUsername }, conversation.status);
+                 }
              }
 
              if (e.target.id === 'accept-chat-btn') {
@@ -2333,6 +2385,8 @@ showLoginBtn.addEventListener('click', (e) => {
         searchCommunityInput.addEventListener('input', applyCommunityFiltersAndRender);
         messageForm.addEventListener('submit', handleMessageSubmission);
         searchUsersInput.addEventListener('input', renderUsersList);
+        toggleReorderBtn.addEventListener('click', toggleReorderMode);
+
 
         searchProjectsInput.addEventListener('input', (e) => {
             projectSearchTerm = e.target.value.toLowerCase();
@@ -2378,8 +2432,6 @@ showLoginBtn.addEventListener('click', (e) => {
                  notificationsPanel.style.display = 'none';
             }
         });
-
-        switchTab('dashboard');
     </script>
 </body>
 </html>
